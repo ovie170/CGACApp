@@ -1,3 +1,11 @@
-﻿// splash.js for CGAC Splash Screen
+﻿// CGAC Splash Screen Script // Shows splash for 3 seconds and then redirects to homepage
 
-// Wait 3 seconds then redirect to homepage setTimeout(function() { window.location.href = "homepage.html"; }, 3000);
+function startSplash() { const splash = document.getElementById("splash"); if (splash) { splash.classList.add("fade-out"); }
+
+setTimeout(() => {
+    window.location.href = "homepage.html";
+}, 3000);
+
+}
+
+window.onload = startSplash;

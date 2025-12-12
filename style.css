@@ -1,11 +1,48 @@
-﻿/* style.css for CGAC Splash Screen */ @font-face { font-family: 'ChurchFont'; src: url('../fonts/church-font.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+﻿<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CGAC Splash Screen</title><style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        animation: fadeIn 1.5s ease-in forwards;
+    }
 
-.splash-body { margin: 0; padding: 0; background: #ffffff; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'ChurchFont', serif; }
+    img {
+        width: 160px; /* Adjust size of logo */
+        height: auto;
+        animation: fadeIn 2s ease-in;
+    }
 
-.splash-container { text-align: center; opacity: 0; animation: fadeIn 2s ease-in forwards; }
+    h1 {
+        margin-top: 15px;
+        font-family: "Georgia", serif; /* Church‑style font */
+        font-size: 28px;
+        color: #001f54; /* Navy blue */
+        animation: fadeIn 2s ease-in;
+    }
 
-.splash-logo { width: 200px; height: auto; margin-bottom: 20px; }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
 
-.splash-text { font-size: 32px; color: #1a237e; /* Navy blue from your logo */ margin: 0; }
+</head>
+<body><!-- Logo (rename your file to logo.png) -->
+<img src="logo.png" alt="CGAC Logo" />
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+<!-- Church title text -->
+<h1>CGAC</h1>
+
+<script src="splash.js"></script>
+
+</body>
+</html>
