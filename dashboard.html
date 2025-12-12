@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MaskNova Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #000000, #0f2027, #2c5364);
+      color: white;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      background: #000000aa;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 0 15px cyan;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      font-size: 2rem;
+      text-shadow: 0 0 15px cyan, 0 0 30px #00e6e6;
+      margin: 0;
+    }
+    .menu-btn {
+      font-size: 1.8rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: cyan;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #111;
+      overflow-x: hidden;
+      transition: 0.3s;
+      padding-top: 60px;
+      box-shadow: 0 0 20px cyan;
+    }
+    .sidebar a {
+      padding: 12px 20px;
+      text-decoration: none;
+      font-size: 1.2rem;
+      color: white;
+      display: block;
+      transition: 0.2s;
+    }
+    .sidebar a:hover {
+      background: cyan;
+      color: black;
+      box-shadow: 0 0 10px cyan;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 2rem;
+      cursor: pointer;
+      color: red;
+    }
+
+    /* Content Cards */
+    .container {
+      padding: 20px;
+      text-align: center;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.3);
+      transition: 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 30px cyan;
+    }
+    .card h2 {
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    /* Footer */
+    footer {
+      background: #000000cc;
+      padding: 15px;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 30px;
+      box-shadow: 0 0 10px cyan;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div id="mySidebar" class="sidebar">
+    <span class="close-btn" onclick="closeNav()">&times;</span>
+    <a href="#">🎮 Games</a>
+    <a href="#">🤖 AI Assistant</a>
+    <a href="#">🎵 Music</a>
+    <a href="#">🎬 Videos</a>
+    <a href="#">⭐ Special</a>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <h1>MaskNova</h1>
+    <button class="menu-btn" onclick="openNav()">☰</button>
+  </header>
+
+  <!-- Content -->
+  <div class="container">
+    <div class="card">
+      <h2>🎵 MaskNova Playlists</h2>
+      <p>Discover and enjoy curated music just for you.</p>
+    </div>
+    <div class="card">
+      <h2>🎬 MaskNova Videos</h2>
+      <p>Watch the latest trending and exclusive videos.</p>
+    </div>
+    <div class="card">
+      <h2>⭐ Something Special</h2>
+      <p>Exclusive features and surprises coming soon.</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 MaskNova Tech. All Rights Reserved.
+  </footer>
+
+  <script>
+    // Sidebar controls
+    function openNav() {
+      document.getElementById("mySidebar").style.width = "250px";
+    }
+    function closeNav() {
+      document.getElementById("mySidebar").style.width = "0";
+    }
+
+    // Display name from index
+    window.onload = function() {
+      const user = localStorage.getItem("masknovaUser");
+      if (user) {
+        alert("Welcome, " + user + " 👋");
+      }
+    };
+  </script>
+</body>
+</html>
