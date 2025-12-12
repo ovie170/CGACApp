@@ -1,0 +1,11 @@
+﻿/* style.css for CGAC Splash Screen */ @font-face { font-family: 'ChurchFont'; src: url('../fonts/church-font.woff2') format('woff2'); font-weight: normal; font-style: normal; }
+
+.splash-body { margin: 0; padding: 0; background: #ffffff; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'ChurchFont', serif; }
+
+.splash-container { text-align: center; opacity: 0; animation: fadeIn 2s ease-in forwards; }
+
+.splash-logo { width: 200px; height: auto; margin-bottom: 20px; }
+
+.splash-text { font-size: 32px; color: #1a237e; /* Navy blue from your logo */ margin: 0; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
