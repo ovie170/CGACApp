@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CGAC Notes</title>  <style>
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      background: #ffffff;
+      color: #1a1a1a;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    header img {
+      width: 42px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+      color: #001f54;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    label {
+      font-size: 14px;
+      color: #001f54;
+      display: block;
+      margin: 15px 0 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      font-family: Georgia, serif;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 14px;
+      width: 100%;
+      background: #001f54;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+    }
+
+    .saved {
+      margin-top: 15px;
+      font-size: 14px;
+      color: green;
+      display: none;
+      text-align: center;
+    }
+
+    .note-list {
+      margin-top: 30px;
+    }
+
+    .note-item {
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: #fafafa;
+    }
+
+    .note-item h3 {
+      margin: 0 0 5px;
+      color: #001f54;
+      font-size: 16px;
+    }
+
+    .note-item small {
+      color: #777;
+    }
+
+    .note-item p {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style></head>
+<body>  <header>
+    <img src="logo.png" alt="CGAC Logo" />
+    <h1>Church Notes</h1>
+  </header>  <div class="container"><label>Title / Topic</label>
+<input type="text" id="title" placeholder="Sunday Service – Faith" />
+
+<label>Bible Reference (optional)</label>
+<input type="text" id="reference" placeholder="Isaiah 58:11" />
+
+<label>Your Notes</label>
+<textarea id="content" placeholder="Write your sermon notes, lessons, or reflections here..."></textarea>
+
+<button onclick="saveNote()">Save Note</button>
+<div class="saved" id="savedMsg">Note saved successfully ✓</div>
+
+<div class="note-list" id="noteList"></div>
+
+  </div>  <script>
+    const titleInput = document.getElementById('title');
+    const refInput = document.getElementById('reference');
+    const contentInput = document.getElementById('content');
+    const savedMsg = document.getElementById('savedMsg');
+    const noteList = document.getElementById('noteList');
+
+    let notes = JSON.parse(localStorage.getItem('cgacNotes')) || [];
+
+    function saveNote() {
+      if (!contentInput.value.trim()) return;
+
+      const note = {
+        title: titleInput.value || 'Untitled Note',
+        reference: refInput.value,
+        content: contentInput.value,
+        date: new Date().toLocaleDateString()
+      };
+
+      notes.unshift(note);
+      localStorage.setItem('cgacNotes', JSON.stringify(notes));
+
+      titleInput.value = '';
+      refInput.value = '';
+      contentInput.value = '';
+
+      savedMsg.style.display = 'block';
+      setTimeout(() => savedMsg.style.display = 'none', 2000);
+
+      renderNotes();
+    }
+
+    function renderNotes() {
+      noteList.innerHTML = '';
+      notes.forEach(note => {
+        const div = document.createElement('div');
+        div.className = 'note-item';
+        div.innerHTML = `
+          <h3>${note.title}</h3>
+          <small>${note.date}${note.reference ? ' • ' + note.reference : ''}</small>
+          <p>${note.content}</p>
+        `;
+        noteList.appendChild(div);
+      });
+    }
+
+    renderNotes();
+  </script></body>
+</html>
