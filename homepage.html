@@ -10,7 +10,6 @@
       color: #1a1a1a;
     }
 
-    /* HEADER */
     header {
       text-align: center;
       padding: 20px 10px 10px;
@@ -19,8 +18,7 @@
 
     header img {
       width: 50px;
-      height: auto;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
 
     header h1 {
@@ -35,11 +33,10 @@
       font-style: italic;
     }
 
-    /* VERSE & HYMN */
     .daily-box {
       margin: 20px;
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 12px;
       background: #fafafa;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
       text-align: center;
@@ -51,27 +48,20 @@
       color: #001f54;
     }
 
-    .daily-box p {
-      font-size: 15px;
-      margin: 8px 0;
-    }
-
-    /* WATERMARK */
     .watermark {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      opacity: 0.05;
+      opacity: 0.04;
       z-index: 0;
-      width: 300px;
+      width: 320px;
     }
 
-    /* GRID */
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      gap: 16px;
       padding: 20px;
       position: relative;
       z-index: 1;
@@ -79,20 +69,21 @@
 
     .card {
       background: #ffffff;
-      border-radius: 15px;
+      border-radius: 16px;
       padding: 20px 10px;
       text-align: center;
       box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      cursor: pointer;
     }
 
-    .card img {
-      width: 50px;
+    .icon {
+      width: 40px;
+      height: 40px;
       margin-bottom: 10px;
+      fill: #001f54;
     }
 
     .card h3 {
-      margin: 5px 0;
+      margin: 6px 0 2px;
       color: #001f54;
     }
 
@@ -119,25 +110,30 @@
   </div>  <!-- HYMN OF THE DAY -->  <div class="daily-box">
     <h2>Hymn of the Day</h2>
     <p>Guide Me, O Thou Great Jehovah</p>
-  </div>  <!-- MAIN GRID -->  <div class="grid">
-    <div class="card">
-      <img src="bible.png" alt="Bible" />
-      <h3>Bible</h3>
-      <p>Read the Word</p>
-    </div><div class="card">
-  <img src="hymn.png" alt="Hymns" />
+  </div>  <!-- MAIN GRID -->  <div class="grid"><!-- Bible -->
+<div class="card">
+  <svg class="icon" viewBox="0 0 24 24"><path d="M4 3h11a3 3 0 0 1 3 3v15a2 2 0 0 0-2-2H4z"/></svg>
+  <h3>Bible</h3>
+  <p>Read the Word</p>
+</div>
+
+<!-- Hymns -->
+<div class="card">
+  <svg class="icon" viewBox="0 0 24 24"><path d="M3 4h18v2H3zm0 4h18v2H3zm0 4h12v2H3z"/></svg>
   <h3>Hymns</h3>
   <p>Church Hymns</p>
 </div>
 
+<!-- Notes -->
 <div class="card">
-  <img src="notes.png" alt="Notes" />
+  <svg class="icon" viewBox="0 0 24 24"><path d="M5 3h14v18H5z"/></svg>
   <h3>Notes</h3>
   <p>Write & Save</p>
 </div>
 
+<!-- Favorites -->
 <div class="card">
-  <img src="star.png" alt="Favorites" />
+  <svg class="icon" viewBox="0 0 24 24"><path d="M12 17l-5 3 2-6-4-4 6-1 3-5 3 5 6 1-4 4 2 6z"/></svg>
   <h3>Favorites</h3>
   <p>Saved Items</p>
 </div>
