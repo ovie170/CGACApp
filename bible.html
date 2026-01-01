@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bible – Full Books Box Layout</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      margin: 0;
+      padding: 15px;
+    }
+    h2 { text-align: center; margin-bottom: 10px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .box {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 15px 5px;
+      text-align: center;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      user-select: none;
+    }
+    .box:hover { background: #eaeaea; }
+    .hidden { display: none; }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .nav button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+    .verse-display {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body><h2 id="title">Bible Books</h2><div class="nav hidden" id="nav">
+  <button onclick="goBooks()">⬅ Books</button>
+  <button onclick="goChapters()">⬅ Chapters</button>
+</div><!-- BOOKS --><div id="books" class="grid"></div><!-- CHAPTERS --><div id="chapters" class="grid hidden"></div><!-- VERSES --><div id="verses" class="grid hidden"></div><!-- VERSE DISPLAY --><div id="verseDisplay" class="verse-display hidden">
+  <select id="versionSelect">
+    <option>KJV</option>
+    <option>NIV</option>
+    <option>ESV</option>
+    <option>NLT</option>
+  </select>
+  <div id="verseText"></div>
+</div><script>
+// FULL BIBLE BOOKS + CHAPTER COUNTS
+const bible = {
+  'Genesis':50,'Exodus':40,'Leviticus':27,'Numbers':36,'Deuteronomy':34,
+  'Joshua':24,'Judges':21,'Ruth':4,'1 Samuel':31,'2 Samuel':24,
+  '1 Kings':22,'2 Kings':25,'1 Chronicles':29,'2 Chronicles':36,
+  'Ezra':10,'Nehemiah':13,'Esther':10,'Job':42,'Psalms':150,
+  'Proverbs':31,'Ecclesiastes':12,'Song of Solomon':8,'Isaiah':66,
+  'Jeremiah':52,'Lamentations':5,'Ezekiel':48,'Daniel':12,
+  'Hosea':14,'Joel':3,'Amos':9,'Obadiah':1,'Jonah':4,'Micah':7,
+  'Nahum':3,'Habakkuk':3,'Zephaniah':3,'Haggai':2,'Zechariah':14,'Malachi':4,
+  'Matthew':28,'Mark':16,'Luke':24,'John':21,'Acts':28,'Romans':16,
+  '1 Corinthians':16,'2 Corinthians':13,'Galatians':6,'Ephesians':6,
+  'Philippians':4,'Colossians':4,'1 Thessalonians':5,'2 Thessalonians':3,
+  '1 Timothy':6,'2 Timothy':4,'Titus':3,'Philemon':1,'Hebrews':13,
+  'James':5,'1 Peter':5,'2 Peter':3,'1 John':5,'2 John':1,'3 John':1,
+  'Jude':1,'Revelation':22
+};
+
+let currentBook = '';
+let currentChapter = 1;
+
+const booksDiv = document.getElementById('books');
+const chaptersDiv = document.getElementById('chapters');
+const versesDiv = document.getElementById('verses');
+const nav = document.getElementById('nav');
+
+// LOAD BOOKS
+for (let book in bible) {
+  booksDiv.innerHTML += `<div class="box" onclick="openChapters('${book}')">${book}</div>`;
+}
+
+function openChapters(book) {
+  currentBook = book;
+  document.getElementById('title').innerText = book + ' – Chapters';
+  booksDiv.classList.add('hidden');
+  chaptersDiv.classList.remove('hidden');
+  nav.classList.remove('hidden');
+  chaptersDiv.innerHTML = '';
+
+  for (let i = 1; i <= bible[book]; i++) {
+    chaptersDiv.innerHTML += `<div class="box" onclick="openVerses(${i})">${i}</div>`;
+  }
+}
+
+function openVerses(chapter) {
+  currentChapter = chapter;
+  chaptersDiv.classList.add('hidden');
+  versesDiv.classList.remove('hidden');
+  document.getElementById('title').innerText = `${currentBook} ${chapter}`;
+  versesDiv.innerHTML = '';
+
+  for (let i = 1; i <= 50; i++) {
+    versesDiv.innerHTML += `<div class="box" onclick="showVerse(${i})">${i}</div>`;
+  }
+}
+
+function showVerse(verse) {
+  document.getElementById('verseDisplay').classList.remove('hidden');
+  document.getElementById('verseText').innerHTML = `<strong>${currentBook} ${currentChapter}:${verse}</strong><br><br>Verse text will load here (API / database ready).`;
+}
+
+function goBooks() {
+  booksDiv.classList.remove('hidden');
+  chaptersDiv.classList.add('hidden');
+  versesDiv.classList.add('hidden');
+  document.getElementById('verseDisplay').classList.add('hidden');
+  nav.classList.add('hidden');
+  document.getElementById('title').innerText = 'Bible Books';
+}
+
+function goChapters() {
+  versesDiv.classList.add('hidden');
+  chaptersDiv.classList.remove('hidden');
+  document.getElementById('verseDisplay').classList.add('hidden');
+  document.getElementById('title').innerText = currentBook + ' – Chapters';
+}
+</script></body>
+</html>
