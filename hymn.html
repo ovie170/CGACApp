@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Church Hymn Book</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            background-color: #ffffff;
+
+            margin: 0;
+
+            padding: 20px;
+
+            color: #000;
+
+        }
+
+
+
+        h1 {
+
+            text-align: center;
+
+            margin-bottom: 10px;
+
+        }
+
+
+
+        .controls {
+
+            text-align: center;
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        input {
+
+            padding: 10px;
+
+            width: 250px;
+
+            max-width: 90%;
+
+            font-size: 16px;
+
+        }
+
+
+
+        button {
+
+            padding: 10px 15px;
+
+            font-size: 16px;
+
+            margin-left: 5px;
+
+            cursor: pointer;
+
+        }
+
+
+
+        .language-toggle {
+
+            margin-top: 10px;
+
+        }
+
+
+
+        .hymn {
+
+            border-top: 1px solid #ccc;
+
+            padding-top: 20px;
+
+            margin-top: 20px;
+
+        }
+
+
+
+        .hymn h2 {
+
+            margin-bottom: 5px;
+
+        }
+
+
+
+        .hymn p {
+
+            white-space: pre-line;
+
+            line-height: 1.6;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<h1>Church Hymn Book</h1>
+
+
+
+<div class="controls">
+
+    <input type="text" id="searchInput" placeholder="Search by hymn number or title">
+
+    <button onclick="searchHymn()">Search</button>
+
+
+
+    <div class="language-toggle">
+
+        <button onclick="setLanguage('english')">English</button>
+
+        <button onclick="setLanguage('yoruba')">Yoruba</button>
+
+    </div>
+
+</div>
+
+
+
+<div id="hymnDisplay"></div>
+
+
+
+<script>
+
+    let currentLanguage = "english";
+
+
+
+    const hymns = [
+
+        {
+
+            number: "1",
+
+            title: "Forth in Thy Name, O Lord I Go",
+
+            english: `
+
+Forth in Thy name, O Lord, I go,
+
+My daily labour to pursue;
+
+Thee, only Thee, resolved to know
+
+In all I think, or speak, or do.
+
+
+
+Preserve me from my calling’s snare,
+
+And hide my simple heart above;
+
+Above the thorns of choking care,
+
+The gilded baits of worldly love.
+
+
+
+Give me to bear Thy easy yoke,
+
+And every moment watch and pray;
+
+And still to things eternal look,
+
+And hasten to Thy glorious day.
+
+
+
+Amen.
+
+            `,
+
+            yoruba: `
+
+Oluwa mi, mo njade lọ,
+
+Lati ṣe iṣẹ ojoojúmọ́ mi;
+
+Iwọ nikan ni emi o mọ
+
+Nínú gbogbo ero ati iṣe mi.
+
+
+
+Dá mi l’ọ́wọ́ idanwo ayé,
+
+Pa ọkan mi mọ́ kúrò ní ẹ̀ṣẹ̀;
+
+Kí n rí ojú Rẹ nínú iṣẹ́ mi,
+
+Kí n sì fi ayọ̀ ṣe ifẹ́ Rẹ.
+
+
+
+Jẹ́ kí n rú ẹrù Rẹ rọrùn,
+
+Kí n sì máa ṣọ́ra gbogbo ìgbà;
+
+Kí n fi ojú sí nkan ọ̀run,
+
+Títí di ọjọ́ ogo.
+
+
+
+Amin.
+
+            `
+
+        }
+
+    ];
+
+
+
+    function setLanguage(lang) {
+
+        currentLanguage = lang;
+
+        document.getElementById("hymnDisplay").innerHTML = "";
+
+    }
+
+
+
+    function searchHymn() {
+
+        const input = document.getElementById("searchInput").value.toLowerCase();
+
+        const display = document.getElementById("hymnDisplay");
+
+        display.innerHTML = "";
+
+
+
+        const result = hymns.find(h =>
+
+            h.number === input || h.title.toLowerCase().includes(input)
+
+        );
+
+
+
+        if (!result) {
+
+            display.innerHTML = "<p>No hymn found.</p>";
+
+            return;
+
+        }
+
+
+
+        display.innerHTML = `
+
+            <div class="hymn">
+
+                <h2>Hymn ${result.number}: ${result.title}</h2>
+
+                <p>${currentLanguage === "english" ? result.english : result.yoruba}</p>
+
+            </div>
+
+        `;
+
+    }
+
+</script>
+
+
+
+</body>
+
+</html>
