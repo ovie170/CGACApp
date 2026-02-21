@@ -1,189 +1,223 @@
-﻿<!DOCTYPE html><html lang="en">
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Holy Bible – King James Version</title>  <style>
-    body {
-      margin: 0;
-      font-family: Georgia, serif;
-      background: #f7f7f7;
-      color: #1a1a1a;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Reader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            position: relative;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.kindpng.com/picc/m/229-2293015_simple-church-cross-logo-png-transparent-png.png'); /* Free transparent church logo [web:6] */
+            background-size: 200px;
+            background-repeat: no-repeat;
+            background-position: center 20px;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .box {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .verse {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+        }
+        .version-selector {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .version-selector select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Holy Bible</h1>
+        
+        <!-- Books Grid -->
+        <div id="books-grid" class="grid"></div>
+        
+        <!-- Chapters Grid -->
+        <button id="back-to-books" class="back-btn hidden">← Back to Books</button>
+        <div id="chapters-grid" class="grid hidden"></div>
+        
+        <!-- Verses Display -->
+        <button id="back-to-chapters" class="back-btn hidden">← Back to Chapters</button>
+        <div id="verses-display" class="hidden"></div>
+        
+        <!-- Version Selector -->
+        <div id="version-selector" class="version-selector hidden">
+            <label>Select Version: </label>
+            <select id="version-select">
+                <option value="kjv">King James Version (KJV)</option>
+                <option value="asv">American Standard Version (ASV)</option>
+                <option value="web">World English Bible (WEB)</option>
+                <option value="ylt">Young's Literal Translation (YLT)</option>
+            </select>
+            <button onclick="loadVerses()">Load Verses</button>
+        </div>
+    </div>
 
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      background: #ffffff;
-      border-bottom: 1px solid #e5e5e5;
-    }
+    <script>
+        const bibleBooks = [
+            // Standard 66 books from Protestant Bible [web:1][web:7][web:9]
+            "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",
+            "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel",
+            "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles",
+            "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs",
+            "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah",
+            "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel",
+            "Amos", "Obadiah", "Jonah", "Micah", "Nahum",
+            "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi",
+            "Matthew", "Mark", "Luke", "John", "Acts",
+            "Romans", "1 Corinthians", "2 Corinthians", "Galatians",
+            "Ephesians", "Philippians", "Colossians", "1 Thessalonians",
+            "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus",
+            "Philemon", "Hebrews", "James", "1 Peter", "2 Peter",
+            "1 John", "2 John", "3 John", "Jude", "Revelation"
+        ];
 
-    header img { width: 40px; }
+        let selectedBook = '';
+        let selectedChapter = 0;
+        const apiBase = 'https://labs.bible/api/'; // Free Bible API no key needed [web:14] (using dailybible.ca style, adapt if needed; alternative free-use-bible-api [web:12])
 
-    header h1 {
-      font-size: 18px;
-      margin: 0;
-      color: #001f54;
-    }
+        // Show books
+        function showBooks() {
+            document.getElementById('books-grid').innerHTML = '';
+            bibleBooks.forEach(book => {
+                const box = document.createElement('div');
+                box.className = 'box';
+                box.textContent = book;
+                box.onclick = () => showChapters(book);
+                document.getElementById('books-grid').appendChild(box);
+            });
+            hideAllExcept('books-grid');
+        }
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 16px;
-    }
+        // Show chapters for book (fixed max 150 for Psalms)
+        function showChapters(book) {
+            selectedBook = book.toLowerCase().replace(/s+/g, '').replace(/[^a-z]/g, '');
+            document.getElementById('chapters-grid').innerHTML = '';
+            for (let ch = 1; ch <= 150; ch++) { // Max chapters, API will handle if less
+                const box = document.createElement('div');
+                box.className = 'box';
+                box.textContent = ch;
+                box.onclick = () => showVerses(book, ch);
+                document.getElementById('chapters-grid').appendChild(box);
+            }
+            document.getElementById('back-to-books').classList.remove('hidden');
+            hideAllExcept('chapters-grid');
+        }
 
-    .selectors {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+        // Show verses selector and version
+        function showVerses(book, chapter) {
+            selectedChapter = chapter;
+            document.getElementById('version-selector').classList.remove('hidden');
+            document.getElementById('back-to-chapters').classList.remove('hidden');
+            hideAllExcept('version-selector');
+            document.getElementById('verses-display').innerHTML = '<p>Select a version above to load verses.</p>';
+        }
 
-    select {
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-family: Georgia, serif;
-      font-size: 14px;
-      background: #fff;
-    }
+        // Load verses from API
+        async function loadVerses() {
+            const version = document.getElementById('version-select').value;
+            const reference = `${selectedBook.toUpperCase().charAt(0)}${selectedBook.slice(1)} ${selectedChapter}`; // e.g. "Genesis 1"
+            try {
+                const response = await fetch(`${apiBase}?passage=${reference}&version=${version}`);
+                const data = await response.json();
+                displayVerses(data, version);
+            } catch (error) {
+                document.getElementById('verses-display').innerHTML = '<p>Error loading verses. Check console.</p>';
+                console.error('API Error:', error);
+            }
+        }
 
-    .source {
-      margin: 8px 0 12px;
-      font-weight: bold;
-      color: #001f54;
-      font-size: 14px;
-    }
+        function displayVerses(data, version) {
+            let html = `<h2>${selectedBook} ${selectedChapter} (${version.toUpperCase()})</h2>`;
+            // Assuming API returns verses array like [{"verse":1,"text":"..."}]
+            if (data.text) {
+                html += data.text.split('
+').map(verse => `<div class="verse">${verse}</div>`).join('');
+            } else {
+                html += '<p>Verses loaded: See API response.</p>';
+            }
+            document.getElementById('verses-display').innerHTML = html;
+            hideAllExcept('verses-display');
+        }
 
-    .chapter-box {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 18px;
-      line-height: 1.8;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
+        function hideAllExcept(showId) {
+            ['books-grid', 'chapters-grid', 'verses-display', 'version-selector'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(showId).classList.remove('hidden');
+        }
 
-    .verse {
-      display: block;
-      margin-bottom: 6px;
-    }
+        // Event listeners
+        document.getElementById('back-to-books').onclick = showBooks;
+        document.getElementById('back-to-chapters').onclick = () => {
+            showChapters(selectedBook);
+            document.getElementById('version-selector').classList.add('hidden');
+        };
 
-    .verse sup {
-      color: #001f54;
-      font-size: 11px;
-      margin-right: 4px;
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 14px;
-      gap: 10px;
-    }
-
-    button {
-      flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      background: #001f54;
-      color: #ffffff;
-      font-size: 14px;
-    }
-  </style></head>
-<body><header>
-  <img src="logo.png" alt="CGAC Logo" />
-  <h1>Holy Bible (KJV)</h1>
-</header><div class="container">  <!-- BOOK & CHAPTER -->  <div class="selectors">
-    <select id="book"></select>
-    <select id="chapter"></select>
-  </div>  <!-- SOURCE -->  <div class="source" id="source"></div>  <!-- FULL CHAPTER DISPLAY (UP & CLEAN) -->  <div class="chapter-box" id="chapterText"></div>  <!-- NAVIGATION -->  <div class="nav">
-    <button onclick="prevChapter()">◀ Previous Chapter</button>
-    <button onclick="nextChapter()">Next Chapter ▶</button>
-  </div></div><script>
-/*
-  PROFESSIONAL BIBLE STRUCTURE
-  - FULL KJV stored in kjv.json (offline, public domain)
-  - Displays FULL CHAPTER text at once
-  - No verse grid, no clutter
-*/
-
-let bible = {};
-let currentBook = '';
-let currentChapter = '';
-
-fetch('kjv.json')
-  .then(res => res.json())
-  .then(data => {
-    bible = data;
-    init();
-  });
-
-function init() {
-  const bookSel = document.getElementById('book');
-  bookSel.innerHTML = '';
-
-  Object.keys(bible).forEach(book => {
-    bookSel.add(new Option(book, book));
-  });
-
-  currentBook = bookSel.value;
-  loadChapters();
-}
-
-function loadChapters() {
-  const chapSel = document.getElementById('chapter');
-  chapSel.innerHTML = '';
-
-  Object.keys(bible[currentBook]).forEach(ch => {
-    chapSel.add(new Option('Chapter ' + ch, ch));
-  });
-
-  currentChapter = chapSel.value;
-  renderChapter();
-}
-
-function renderChapter() {
-  const verses = bible[currentBook][currentChapter];
-  let html = '';
-
-  Object.keys(verses).forEach(v => {
-    html += `<span class=\"verse\"><sup>${v}</sup>${verses[v]}</span>`;
-  });
-
-  document.getElementById('chapterText').innerHTML = html;
-  document.getElementById('source').innerText = `${currentBook} ${currentChapter} (KJV)`;
-}
-
-book.onchange = e => {
-  currentBook = e.target.value;
-  loadChapters();
-};
-
-chapter.onchange = e => {
-  currentChapter = e.target.value;
-  renderChapter();
-};
-
-function prevChapter() {
-  const chapters = Object.keys(bible[currentBook]);
-  let i = chapters.indexOf(currentChapter);
-  if (i > 0) {
-    currentChapter = chapters[i - 1];
-    chapter.value = currentChapter;
-    renderChapter();
-  }
-}
-
-function nextChapter() {
-  const chapters = Object.keys(bible[currentBook]);
-  let i = chapters.indexOf(currentChapter);
-  if (i < chapters.length - 1) {
-    currentChapter = chapters[i + 1];
-    chapter.value = currentChapter;
-    renderChapter();
-  }
-}
-</script></body>
+        // Init
+        showBooks();
+    </script>
+</body>
 </html>
