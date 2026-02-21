@@ -104,6 +104,12 @@
       font-size: 14px;
     }
   </style></head>
+   <script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js")
+    .then(() => console.log("Service Worker Registered"));
+}
+   </script>
 <body>  <header>
     <img src="logo.png" alt="CGAC Logo" />
     <h1>Church Notes</h1>
@@ -170,4 +176,5 @@
     renderNotes();
   </script></body>
 </html>
+
 
