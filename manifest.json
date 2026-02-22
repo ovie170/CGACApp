@@ -1,22 +1,74 @@
 ﻿{
+  "id": "com.cgac.church.app",
   "name": "Christ Gospel Apostolic Church",
   "short_name": "CGAC",
   "description": "Bible, Hymns, Notes and Favorites - God is our guide",
-  "start_url": "index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#001f54",
-  "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
+
   "icons": [
     {
-      "src": "logo.png",
-      "sizes": "192x192",
+      "src": "/icons/icon-72.png",
+      "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "logo.png",
-      "sizes": "512x512",
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
       "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/bible.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }
