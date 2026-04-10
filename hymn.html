@@ -3,59 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hymns</title>
+<title>Hymn Book</title>
 
 <style>
 body {
   margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #0a1f44, #1a3d7c);
-  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  background: #ffffff;
+  color: #111;
 }
 
 /* WATERMARK LOGO */
-body::after {
+body::before {
   content: "";
-  background: url('logo.png') no-repeat center;
-  background-size: 200px;
-  opacity: 0.05;
   position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  background: url('logo.png') no-repeat center;
+  background-size: contain;
+  opacity: 0.06;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 /* HEADER */
-.header {
-  padding: 20px;
+header {
   text-align: center;
-  font-size: 20px;
+  padding: 20px;
   font-weight: bold;
+  font-size: 18px;
 }
 
-/* GLASS CARD */
+/* GLASS EFFECT */
 .glass {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(15px);
-  border-radius: 20px;
-  padding: 15px;
-  margin: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.7);
+  border-radius: 30px;
+  border: 1px solid rgba(0, 150, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
 /* SEARCH BAR */
 .search-box {
-  position: sticky;
-  top: 10px;
-  margin: 15px;
+  margin: 10px auto;
+  width: 90%;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
 }
 
 .search-box input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 30px;
   border: none;
   outline: none;
+  background: transparent;
+  width: 100%;
   font-size: 14px;
 }
 
@@ -64,109 +67,139 @@ body::after {
   display: flex;
   justify-content: center;
   gap: 10px;
+  margin: 10px;
 }
 
 .lang-btn {
-  padding: 10px 20px;
-  border-radius: 20px;
-  border: none;
-  background: rgba(255,255,255,0.2);
-  color: white;
+  padding: 8px 16px;
   cursor: pointer;
+  font-size: 13px;
 }
 
-.lang-btn.active {
-  background: #00bfff;
+.active {
+  border: 1px solid #007bff;
 }
 
-/* HYMN LIST */
+/* HYMN GRID */
+.hymn-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+  padding: 15px;
+}
+
 .hymn {
-  padding: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
+  text-align: center;
+  padding: 10px;
   cursor: pointer;
 }
 
-/* PASSAGE */
-#lyrics {
-  margin-top: 10px;
-  line-height: 1.7;
+/* DISPLAY */
+.display {
+  margin: 15px;
+  padding: 15px;
+  border-radius: 20px;
 }
+
+.title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="header">CGAC Hymns</div>
+<header>Hymn Book</header>
 
+<!-- SEARCH -->
 <div class="search-box glass">
-  <input type="text" id="search" placeholder="Search hymn...">
+  <input type="text" id="search" placeholder="Search hymn number or title...">
 </div>
 
-<div class="glass lang-switch">
-  <button class="lang-btn active" onclick="setLang('en')">English</button>
-  <button class="lang-btn" onclick="setLang('yo')">Yoruba</button>
+<!-- LANGUAGE -->
+<div class="lang-switch">
+  <div class="lang-btn glass active" onclick="setLang('English', this)">English</div>
+  <div class="lang-btn glass" onclick="setLang('Yoruba', this)">Yoruba</div>
 </div>
 
-<div class="glass" id="list"></div>
+<!-- HYMN LIST -->
+<div class="hymn-list" id="hymnList"></div>
 
-<div class="glass">
-  <div id="title"></div>
+<!-- DISPLAY -->
+<div class="display glass">
+  <div class="title" id="title">Select a hymn</div>
   <div id="lyrics"></div>
 </div>
 
 <script>
-let hymns = [];
-let currentLang = "en";
 
-fetch("hymns.json")
+let hymns = {};
+let currentLang = "English";
+
+fetch('hymns.json')
 .then(res => res.json())
 .then(data => {
   hymns = data;
-  displayHymns(hymns);
+  loadHymns();
 });
 
-function displayHymns(data) {
-  const list = document.getElementById("list");
+function setLang(lang, el) {
+  currentLang = lang;
+
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
+
+  loadHymns();
+}
+
+function loadHymns() {
+  const list = document.getElementById('hymnList');
   list.innerHTML = "";
 
-  data.forEach(h => {
-    const div = document.createElement("div");
-    div.className = "hymn";
-    div.innerText = currentLang === "en" ? h.title_en : h.title_yo;
-
-    div.onclick = () => showHymn(h);
-
+  Object.keys(hymns[currentLang]).forEach(num => {
+    const div = document.createElement('div');
+    div.className = "hymn glass";
+    div.innerText = num;
+    div.onclick = () => showHymn(num);
     list.appendChild(div);
   });
 }
 
-function showHymn(h) {
-  document.getElementById("title").innerText =
-    currentLang === "en" ? h.title_en : h.title_yo;
+function showHymn(num) {
+  const hymn = hymns[currentLang][num];
 
-  document.getElementById("lyrics").innerText =
-    currentLang === "en" ? h.lyrics_en : h.lyrics_yo;
+  document.getElementById('title').innerText =
+    `Hymn ${num} - ${hymn.title}`;
+
+  document.getElementById('lyrics').innerText =
+    hymn.lyrics;
 }
 
-function setLang(lang) {
-  currentLang = lang;
+/* SEARCH */
+document.getElementById('search').addEventListener('input', function() {
+  const value = this.value.toLowerCase();
+  const list = document.getElementById('hymnList');
 
-  document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
-  event.target.classList.add("active");
+  list.innerHTML = "";
 
-  displayHymns(hymns);
-}
+  Object.keys(hymns[currentLang]).forEach(num => {
+    const hymn = hymns[currentLang][num];
 
-document.getElementById("search").addEventListener("input", function() {
-  const val = this.value.toLowerCase();
-
-  const filtered = hymns.filter(h =>
-    h.title_en.toLowerCase().includes(val) ||
-    h.title_yo.toLowerCase().includes(val)
-  );
-
-  displayHymns(filtered);
+    if (
+      num.includes(value) ||
+      hymn.title.toLowerCase().includes(value)
+    ) {
+      const div = document.createElement('div');
+      div.className = "hymn glass";
+      div.innerText = num;
+      div.onclick = () => showHymn(num);
+      list.appendChild(div);
+    }
+  });
 });
+
 </script>
 
 </body>
