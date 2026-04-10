@@ -3,35 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hymn Book</title>
+<title>CGAC Hymns</title>
 
 <style>
+
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   background: #ffffff;
-  color: #111;
+  overflow-x: hidden;
 }
 
-/* WATERMARK LOGO */
+/* WATERMARK */
 body::before {
   content: "";
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 300px;
-  height: 300px;
-  background: url('logo.png') no-repeat center;
-  background-size: contain;
-  opacity: 0.06;
+  width: 250px;
+  height: 250px;
+  background: url('logo.png') no-repeat center/contain;
+  opacity: 0.05;
   transform: translate(-50%, -50%);
-  pointer-events: none;
 }
 
 /* HEADER */
 header {
   text-align: center;
-  padding: 20px;
+  padding: 15px;
   font-weight: bold;
   font-size: 18px;
 }
@@ -39,66 +38,49 @@ header {
 /* GLASS EFFECT */
 .glass {
   backdrop-filter: blur(12px);
-  background: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.4);
   border-radius: 30px;
-  border: 1px solid rgba(0, 150, 255, 0.2);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,150,255,0.4);
+  box-shadow: 0 0 20px rgba(0,150,255,0.2);
 }
 
-/* SEARCH BAR */
+/* SEARCH */
 .search-box {
   margin: 10px auto;
   width: 90%;
-  padding: 10px 15px;
-  display: flex;
-  align-items: center;
+  max-width: 400px;
+  padding: 12px;
 }
 
 .search-box input {
+  width: 100%;
   border: none;
   outline: none;
   background: transparent;
-  width: 100%;
-  font-size: 14px;
 }
 
-/* LANGUAGE SWITCH */
-.lang-switch {
+/* LANGUAGE */
+.lang {
   display: flex;
   justify-content: center;
   gap: 10px;
   margin: 10px;
 }
 
-.lang-btn {
-  padding: 8px 16px;
+.lang div {
+  padding: 8px 15px;
   cursor: pointer;
-  font-size: 13px;
 }
 
 .active {
-  border: 1px solid #007bff;
+  background: #001f54;
+  color: white;
 }
 
-/* HYMN GRID */
-.hymn-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 10px;
-  padding: 15px;
-}
-
-.hymn {
-  text-align: center;
-  padding: 10px;
-  cursor: pointer;
-}
-
-/* DISPLAY */
-.display {
+/* HYMN DISPLAY TOP */
+.viewer {
   margin: 15px;
   padding: 15px;
-  border-radius: 20px;
 }
 
 .title {
@@ -106,98 +88,99 @@ header {
   margin-bottom: 10px;
 }
 
+/* HYMN GRID */
+.hymns {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px,1fr));
+  gap: 10px;
+  padding: 15px;
+}
+
+.hymn {
+  text-align: center;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.hymn:hover {
+  box-shadow: 0 0 15px rgba(0,150,255,0.6);
+}
+
 </style>
 </head>
 
 <body>
 
-<header>Hymn Book</header>
+<header>📖 CGAC Hymns</header>
+
+<!-- DISPLAY FIRST -->
+<div class="viewer glass">
+  <div class="title" id="title">Select Hymn</div>
+  <div id="content"></div>
+</div>
 
 <!-- SEARCH -->
 <div class="search-box glass">
-  <input type="text" id="search" placeholder="Search hymn number or title...">
+  <input type="text" id="search" placeholder="Search hymn...">
 </div>
 
 <!-- LANGUAGE -->
-<div class="lang-switch">
-  <div class="lang-btn glass active" onclick="setLang('English', this)">English</div>
-  <div class="lang-btn glass" onclick="setLang('Yoruba', this)">Yoruba</div>
+<div class="lang">
+  <div class="glass active" onclick="setLang('english', this)">English</div>
+  <div class="glass" onclick="setLang('yoruba', this)">Yoruba</div>
 </div>
 
-<!-- HYMN LIST -->
-<div class="hymn-list" id="hymnList"></div>
-
-<!-- DISPLAY -->
-<div class="display glass">
-  <div class="title" id="title">Select a hymn</div>
-  <div id="lyrics"></div>
-</div>
+<!-- HYMN NUMBERS -->
+<div class="hymns" id="list"></div>
 
 <script>
 
-let hymns = {};
-let currentLang = "English";
+let hymns = [];
+let lang = "english";
 
-fetch('hymns.json')
+fetch("hymns.json")
 .then(res => res.json())
 .then(data => {
   hymns = data;
-  loadHymns();
+  render(hymns);
 });
 
-function setLang(lang, el) {
-  currentLang = lang;
+function render(list) {
+  const box = document.getElementById("list");
+  box.innerHTML = "";
 
-  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-  el.classList.add('active');
-
-  loadHymns();
-}
-
-function loadHymns() {
-  const list = document.getElementById('hymnList');
-  list.innerHTML = "";
-
-  Object.keys(hymns[currentLang]).forEach(num => {
-    const div = document.createElement('div');
+  list.forEach(h => {
+    let div = document.createElement("div");
     div.className = "hymn glass";
-    div.innerText = num;
-    div.onclick = () => showHymn(num);
-    list.appendChild(div);
+    div.innerText = h.id;
+    div.onclick = () => show(h);
+    box.appendChild(div);
   });
 }
 
-function showHymn(num) {
-  const hymn = hymns[currentLang][num];
+function show(h) {
+  document.getElementById("title").innerText =
+    h.id + ". " + h[lang].title;
 
-  document.getElementById('title').innerText =
-    `Hymn ${num} - ${hymn.title}`;
-
-  document.getElementById('lyrics').innerText =
-    hymn.lyrics;
+  document.getElementById("content").innerText =
+    h[lang].lyrics;
 }
 
-/* SEARCH */
-document.getElementById('search').addEventListener('input', function() {
-  const value = this.value.toLowerCase();
-  const list = document.getElementById('hymnList');
+function setLang(l, el) {
+  lang = l;
+  document.querySelectorAll(".lang div")
+    .forEach(x => x.classList.remove("active"));
+  el.classList.add("active");
+}
 
-  list.innerHTML = "";
+document.getElementById("search").addEventListener("input", e => {
+  let val = e.target.value.toLowerCase();
 
-  Object.keys(hymns[currentLang]).forEach(num => {
-    const hymn = hymns[currentLang][num];
+  let filtered = hymns.filter(h =>
+    h.english.title.toLowerCase().includes(val)
+  );
 
-    if (
-      num.includes(value) ||
-      hymn.title.toLowerCase().includes(value)
-    ) {
-      const div = document.createElement('div');
-      div.className = "hymn glass";
-      div.innerText = num;
-      div.onclick = () => showHymn(num);
-      list.appendChild(div);
-    }
-  });
+  render(filtered);
 });
 
 </script>
