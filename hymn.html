@@ -1,312 +1,173 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#001f54">
-
-    <meta charset="UTF-8">
-
-    <title>Church Hymn Book</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-    <style>
-
-        body {
-
-            font-family: Arial, sans-serif;
-
-            background-color: #ffffff;
-
-            margin: 0;
-
-            padding: 20px;
-
-            color: #000;
-
-        }
-
-
-
-        h1 {
-
-            text-align: center;
-
-            margin-bottom: 10px;
-
-        }
-
-
-
-        .controls {
-
-            text-align: center;
-
-            margin-bottom: 20px;
-
-        }
-
-
-
-        input {
-
-            padding: 10px;
-
-            width: 250px;
-
-            max-width: 90%;
-
-            font-size: 16px;
-
-        }
-
-
-
-        button {
-
-            padding: 10px 15px;
-
-            font-size: 16px;
-
-            margin-left: 5px;
-
-            cursor: pointer;
-
-        }
-
-
-
-        .language-toggle {
-
-            margin-top: 10px;
-
-        }
-
-
-
-        .hymn {
-
-            border-top: 1px solid #ccc;
-
-            padding-top: 20px;
-
-            margin-top: 20px;
-
-        }
-
-
-
-        .hymn h2 {
-
-            margin-bottom: 5px;
-
-        }
-
-
-
-        .hymn p {
-
-            white-space: pre-line;
-
-            line-height: 1.6;
-
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hymns</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #0a1f44, #1a3d7c);
+  color: white;
+}
+
+/* WATERMARK LOGO */
+body::after {
+  content: "";
+  background: url('logo.png') no-repeat center;
+  background-size: 200px;
+  opacity: 0.05;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+}
+
+/* HEADER */
+.header {
+  padding: 20px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* GLASS CARD */
+.glass {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 15px;
+  margin: 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* SEARCH BAR */
+.search-box {
+  position: sticky;
+  top: 10px;
+  margin: 15px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+/* LANGUAGE SWITCH */
+.lang-switch {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.lang-btn {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
+}
+
+.lang-btn.active {
+  background: #00bfff;
+}
+
+/* HYMN LIST */
+.hymn {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  cursor: pointer;
+}
+
+/* PASSAGE */
+#lyrics {
+  margin-top: 10px;
+  line-height: 1.7;
+}
+</style>
 </head>
 
 <body>
 
+<div class="header">CGAC Hymns</div>
 
-
-<h1>Church Hymn Book</h1>
-
-
-
-<div class="controls">
-
-    <input type="text" id="searchInput" placeholder="Search by hymn number or title">
-
-    <button onclick="searchHymn()">Search</button>
-
-
-
-    <div class="language-toggle">
-
-        <button onclick="setLanguage('english')">English</button>
-
-        <button onclick="setLanguage('yoruba')">Yoruba</button>
-
-    </div>
-
+<div class="search-box glass">
+  <input type="text" id="search" placeholder="Search hymn...">
 </div>
 
+<div class="glass lang-switch">
+  <button class="lang-btn active" onclick="setLang('en')">English</button>
+  <button class="lang-btn" onclick="setLang('yo')">Yoruba</button>
+</div>
 
+<div class="glass" id="list"></div>
 
-<div id="hymnDisplay"></div>
-
-
+<div class="glass">
+  <div id="title"></div>
+  <div id="lyrics"></div>
+</div>
 
 <script>
-
-    let currentLanguage = "english";
-
-
-
-    const hymns = [
-
-        {
-
-            number: "1",
-
-            title: "Forth in Thy Name, O Lord I Go",
-
-            english: `
-
-Forth in Thy name, O Lord, I go,
-
-My daily labour to pursue;
-
-Thee, only Thee, resolved to know
-
-In all I think, or speak, or do.
-
-
-
-Preserve me from my calling’s snare,
-
-And hide my simple heart above;
-
-Above the thorns of choking care,
-
-The gilded baits of worldly love.
-
-
-
-Give me to bear Thy easy yoke,
-
-And every moment watch and pray;
-
-And still to things eternal look,
-
-And hasten to Thy glorious day.
-
-
-
-Amen.
-
-            `,
-
-            yoruba: `
-
-Oluwa mi, mo njade lọ,
-
-Lati ṣe iṣẹ ojoojúmọ́ mi;
-
-Iwọ nikan ni emi o mọ
-
-Nínú gbogbo ero ati iṣe mi.
-
-
-
-Dá mi l’ọ́wọ́ idanwo ayé,
-
-Pa ọkan mi mọ́ kúrò ní ẹ̀ṣẹ̀;
-
-Kí n rí ojú Rẹ nínú iṣẹ́ mi,
-
-Kí n sì fi ayọ̀ ṣe ifẹ́ Rẹ.
-
-
-
-Jẹ́ kí n rú ẹrù Rẹ rọrùn,
-
-Kí n sì máa ṣọ́ra gbogbo ìgbà;
-
-Kí n fi ojú sí nkan ọ̀run,
-
-Títí di ọjọ́ ogo.
-
-
-
-Amin.
-
-            `
-
-        }
-
-    ];
-
-
-
-    function setLanguage(lang) {
-
-        currentLanguage = lang;
-
-        document.getElementById("hymnDisplay").innerHTML = "";
-
-    }
-
-
-
-    function searchHymn() {
-
-        const input = document.getElementById("searchInput").value.toLowerCase();
-
-        const display = document.getElementById("hymnDisplay");
-
-        display.innerHTML = "";
-
-
-
-        const result = hymns.find(h =>
-
-            h.number === input || h.title.toLowerCase().includes(input)
-
-        );
-
-
-
-        if (!result) {
-
-            display.innerHTML = "<p>No hymn found.</p>";
-
-            return;
-
-        }
-
-
-
-        display.innerHTML = `
-
-            <div class="hymn">
-
-                <h2>Hymn ${result.number}: ${result.title}</h2>
-
-                <p>${currentLanguage === "english" ? result.english : result.yoruba}</p>
-
-            </div>
-
-        `;
-
-    }
-
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js")
-    .then(() => console.log("Service Worker Registered"));
+let hymns = [];
+let currentLang = "en";
+
+fetch("hymns.json")
+.then(res => res.json())
+.then(data => {
+  hymns = data;
+  displayHymns(hymns);
+});
+
+function displayHymns(data) {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(h => {
+    const div = document.createElement("div");
+    div.className = "hymn";
+    div.innerText = currentLang === "en" ? h.title_en : h.title_yo;
+
+    div.onclick = () => showHymn(h);
+
+    list.appendChild(div);
+  });
 }
-</script>
 
+function showHymn(h) {
+  document.getElementById("title").innerText =
+    currentLang === "en" ? h.title_en : h.title_yo;
+
+  document.getElementById("lyrics").innerText =
+    currentLang === "en" ? h.lyrics_en : h.lyrics_yo;
+}
+
+function setLang(lang) {
+  currentLang = lang;
+
+  document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+
+  displayHymns(hymns);
+}
+
+document.getElementById("search").addEventListener("input", function() {
+  const val = this.value.toLowerCase();
+
+  const filtered = hymns.filter(h =>
+    h.title_en.toLowerCase().includes(val) ||
+    h.title_yo.toLowerCase().includes(val)
+  );
+
+  displayHymns(filtered);
+});
+</script>
 
 </body>
-
 </html>
-
-
