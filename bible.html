@@ -1,358 +1,225 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#001f54">
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Bible - CGL Church</title>
-
-
+<title>Bible</title>
 
 <style>
 
 body {
-
-    margin: 0;
-
-    font-family: Arial, sans-serif;
-
-    background: #ffffff;
-
-    color: #000;
-
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #ffffff;
 }
 
+/* SPLASH SCREEN */
+#splash {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeOut 2s ease forwards;
+  animation-delay: 2s;
+}
 
+#splash h1 {
+  font-size: 22px;
+  color: #0a84ff;
+  animation: glow 1.5s infinite alternate;
+}
 
+@keyframes glow {
+  from { text-shadow: 0 0 5px #0a84ff; }
+  to { text-shadow: 0 0 20px #0a84ff; }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* HEADER */
 header {
-
-    background: #f8f8f8;
-
-    padding: 15px;
-
-    text-align: center;
-
-    font-weight: bold;
-
-    font-size: 20px;
-
-    border-bottom: 1px solid #ddd;
-
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
 
-
-
-.container {
-
-    padding: 15px;
-
+/* BACK BUTTON */
+.back {
+  padding: 8px 12px;
+  border-radius: 15px;
+  margin-right: 10px;
+  background: rgba(0,150,255,0.2);
+  cursor: pointer;
 }
 
-
-
-#passageDisplay {
-
-    background: #f2f2f2;
-
-    padding: 15px;
-
-    border-radius: 8px;
-
-    margin-bottom: 20px;
-
-    min-height: 80px;
-
+/* SEARCH */
+.search {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(0,150,255,0.3);
 }
 
-
-
-.selectors {
-
-    display: flex;
-
-    gap: 10px;
-
-    flex-wrap: wrap;
-
-    margin-bottom: 15px;
-
+/* LIST */
+.list {
+  padding: 10px;
 }
 
-
-
-select, input {
-
-    padding: 8px;
-
-    font-size: 14px;
-
-    border: 1px solid #ccc;
-
-    border-radius: 5px;
-
+/* ITEM */
+.item {
+  padding: 12px;
+  margin: 5px 0;
+  border-radius: 15px;
+  background: rgba(0,150,255,0.1);
+  cursor: pointer;
 }
 
-
-
-button {
-
-    padding: 8px 15px;
-
-    background: black;
-
-    color: white;
-
-    border: none;
-
-    border-radius: 5px;
-
-    cursor: pointer;
-
+.item:active {
+  background: rgba(0,150,255,0.3);
 }
 
-
-
-.books {
-
-    display: grid;
-
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-
-    gap: 10px;
-
-}
-
-
-
-.book-box {
-
-    background: #ffffff;
-
-    border: 1px solid #000;
-
-    text-align: center;
-
-    padding: 10px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-size: 13px;
-
-}
-
-
-
-.book-box:hover {
-
-    background: #000;
-
-    color: #fff;
-
+/* VERSE VIEW */
+#viewer {
+  padding: 15px;
 }
 
 </style>
-
 </head>
-
-
 
 <body>
 
-
-
-<header>BIBLE</header>
-
-
-
-<div class="container">
-
-
-
-<div id="passageDisplay">
-
-Select a book, chapter and verse to display passage.
-
+<!-- SPLASH -->
+<div id="splash">
+  <h1>📖 CGAC Bible</h1>
 </div>
 
+<header>
+  <div class="back" onclick="goBack()">← Back</div>
+  <h3 id="title">Bible</h3>
+</header>
 
+<input type="text" class="search" id="search" placeholder="Search...">
 
-<div class="selectors">
+<div class="list" id="list"></div>
 
-    <select id="version">
-
-        <option value="kjv">KJV</option>
-
-        <option value="asv">ASV</option>
-
-        <option value="web">WEB</option>
-
-    </select>
-
-
-
-    <input type="number" id="chapter" placeholder="Chapter">
-
-    <input type="number" id="verse" placeholder="Verse">
-
-    <button onclick="fetchVerse()">Search</button>
-
-</div>
-
-
-
-<div class="books" id="booksContainer"></div>
-
-
-
-</div>
-
-
+<div id="viewer"></div>
 
 <script>
 
+let data = {};
+let state = "books"; // books → chapters → verses
+let currentBook = "";
+let currentChapter = 0;
 
-
-const books = [
-
-"Genesis","Exodus","Leviticus","Numbers","Deuteronomy",
-
-"Joshua","Judges","Ruth","1 Samuel","2 Samuel",
-
-"1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra",
-
-"Nehemiah","Esther","Job","Psalms","Proverbs",
-
-"Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations",
-
-"Ezekiel","Daniel","Hosea","Joel","Amos",
-
-"Obadiah","Jonah","Micah","Nahum","Habakkuk",
-
-"Zephaniah","Haggai","Zechariah","Malachi",
-
-"Matthew","Mark","Luke","John","Acts",
-
-"Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians",
-
-"Philippians","Colossians","1 Thessalonians","2 Thessalonians",
-
-"1 Timothy","2 Timothy","Titus","Philemon",
-
-"Hebrews","James","1 Peter","2 Peter",
-
-"1 John","2 John","3 John","Jude","Revelation"
-
-];
-
-
-
-const booksContainer = document.getElementById("booksContainer");
-
-
-
-books.forEach(book => {
-
-    const div = document.createElement("div");
-
-    div.className = "book-box";
-
-    div.innerText = book;
-
-    div.onclick = () => selectBook(book);
-
-    booksContainer.appendChild(div);
-
+fetch("bible.json")
+.then(res => res.json())
+.then(bible => {
+  data = bible;
+  showBooks();
 });
 
+/* SHOW BOOKS */
+function showBooks() {
+  state = "books";
+  document.getElementById("title").innerText = "Books";
+  let box = document.getElementById("list");
+  box.innerHTML = "";
 
-
-let selectedBook = "";
-
-
-
-function selectBook(book) {
-
-    selectedBook = book;
-
-    document.getElementById("passageDisplay").innerHTML =
-
-        "Selected Book: <b>" + book + "</b>";
-
+  Object.keys(data).forEach(book => {
+    let div = document.createElement("div");
+    div.className = "item";
+    div.innerText = book;
+    div.onclick = () => showChapters(book);
+    box.appendChild(div);
+  });
 }
 
+/* SHOW CHAPTERS */
+function showChapters(book) {
+  state = "chapters";
+  currentBook = book;
 
+  document.getElementById("title").innerText = book;
 
-function fetchVerse() {
+  let box = document.getElementById("list");
+  box.innerHTML = "";
 
-    const chapter = document.getElementById("chapter").value;
+  let chapters = data[book];
 
-    const verse = document.getElementById("verse").value;
+  for (let i = 1; i <= chapters.length; i++) {
+    let div = document.createElement("div");
+    div.className = "item";
+    div.innerText = "Chapter " + i;
+    div.onclick = () => showVerses(book, i);
+    box.appendChild(div);
+  }
+}
 
-    const version = document.getElementById("version").value;
+/* SHOW VERSES */
+function showVerses(book, chapter) {
+  state = "verses";
+  currentChapter = chapter;
 
+  document.getElementById("title").innerText =
+    book + " " + chapter;
 
+  let verses = data[book][chapter - 1];
 
-    if (!selectedBook || !chapter || !verse) {
+  let viewer = document.getElementById("viewer");
+  viewer.innerHTML = "";
 
-        alert("Please select book, chapter and verse.");
+  verses.forEach((v, i) => {
+    let p = document.createElement("p");
+    p.innerText = (i + 1) + ". " + v;
+    viewer.appendChild(p);
+  });
 
-        return;
+  document.getElementById("list").innerHTML = "";
+}
 
+/* BACK */
+function goBack() {
+  if (state === "verses") {
+    showChapters(currentBook);
+  } else if (state === "chapters") {
+    showBooks();
+  } else {
+    window.location.href = "index.html";
+  }
+}
+
+/* SEARCH */
+document.getElementById("search").addEventListener("input", e => {
+  let val = e.target.value.toLowerCase();
+  let box = document.getElementById("list");
+  box.innerHTML = "";
+
+  Object.keys(data).forEach(book => {
+    if (book.toLowerCase().includes(val)) {
+      let div = document.createElement("div");
+      div.className = "item";
+      div.innerText = book;
+      div.onclick = () => showChapters(book);
+      box.appendChild(div);
     }
-
-
-
-    const query = selectedBook + " " + chapter + ":" + verse;
-
-    const url = `https://bible-api.com/${encodeURIComponent(query)}?translation=${version}`;
-
-
-
-    fetch(url)
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        document.getElementById("passageDisplay").innerHTML =
-
-            "<b>" + data.reference + " (" + version.toUpperCase() + ")</b><br><br>" +
-
-            data.text;
-
-    })
-
-    .catch(error => {
-
-        document.getElementById("passageDisplay").innerHTML =
-
-            "Error fetching verse.";
-
-    });
-
-}
-
-
+  });
+});
 
 </script>
 
+<!-- OFFLINE -->
 <script>
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js")
-    .then(() => console.log("Service Worker Registered"));
+  navigator.serviceWorker.register("service-worker.js");
 }
 </script>
 
 </body>
-
 </html>
-
 
