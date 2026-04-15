@@ -7,11 +7,12 @@
 
 <style>
 
+/* BACKGROUND */
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(10px);
+  background: #3b2a1f; /* deep brown */
+  color: #fff;
 }
 
 /* WATERMARK */
@@ -32,23 +33,42 @@ body::before {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: white;
+  background: #3b2a1f;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 999;
   animation: fadeOut 2s ease forwards;
-  animation-delay: 2s;
+  animation-delay: 2.5s;
 }
 
-#splash h1 {
-  color: #0a84ff;
+.book {
+  width: 60px;
+  height: 40px;
+  border: 2px solid white;
+  border-radius: 4px;
+  position: relative;
+  animation: openBook 2s infinite alternate;
+}
+
+.book::after {
+  content: "+";
+  position: absolute;
+  top: -20px;
+  left: 18px;
+  font-size: 20px;
   animation: glow 1.5s infinite alternate;
 }
 
+@keyframes openBook {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(20deg); }
+}
+
 @keyframes glow {
-  from { text-shadow: 0 0 5px #0a84ff; }
-  to { text-shadow: 0 0 25px #0a84ff; }
+  from { text-shadow: 0 0 5px white; }
+  to { text-shadow: 0 0 20px #0a84ff; }
 }
 
 @keyframes fadeOut {
@@ -64,12 +84,12 @@ header {
 
 /* BACK BUTTON */
 .back {
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 20px;
-  background: rgba(0,150,255,0.2);
   backdrop-filter: blur(10px);
-  margin-right: 10px;
+  background: rgba(255,255,255,0.1);
   cursor: pointer;
+  margin-right: 10px;
 }
 
 /* SEARCH */
@@ -83,31 +103,26 @@ header {
   border-radius: 25px;
   border: none;
   outline: none;
-  background: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.1);
+  color: white;
   backdrop-filter: blur(10px);
-  box-shadow: 0 0 10px rgba(0,150,255,0.3);
+  box-shadow: 0 0 10px rgba(255,255,255,0.2);
+  animation: starGlow 2s infinite alternate;
 }
 
-/* LIST */
-.list {
-  padding: 10px;
+@keyframes starGlow {
+  from { box-shadow: 0 0 5px #fff; }
+  to { box-shadow: 0 0 20px #0a84ff; }
 }
 
-/* ITEM */
+/* LIST BOX (Books + Chapters ONLY) */
 .item {
+  margin: 8px 10px;
   padding: 12px;
-  margin: 6px 0;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.5);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0,150,255,0.2);
+  border-radius: 15px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(6px);
   cursor: pointer;
-  transition: 0.2s;
-}
-
-.item:active {
-  transform: scale(0.96);
-  box-shadow: 0 0 20px rgba(0,150,255,0.5);
 }
 
 /* VERSES */
@@ -116,8 +131,8 @@ header {
 }
 
 #viewer p {
-  margin-bottom: 10px;
   line-height: 1.6;
+  margin-bottom: 10px;
 }
 
 </style>
@@ -127,51 +142,47 @@ header {
 
 <!-- SPLASH -->
 <div id="splash">
-  <h1>📖 Opening Bible...</h1>
+  <div class="book"></div>
+  <p>Opening Bible...</p>
 </div>
 
 <header>
   <div class="back" onclick="goBack()">←</div>
-  <h3 id="title">Bible</h3>
+  <h3 id="title">Bible (KJV)</h3>
 </header>
 
 <div class="search-box">
   <input type="text" id="search" placeholder="Search book...">
 </div>
 
-<div class="list" id="list"></div>
+<div id="list"></div>
 <div id="viewer"></div>
 
 <script>
 
+let rawData = [];
 let data = {};
 let state = "books";
 let currentBook = "";
 let currentChapter = 0;
 
-/* LOAD BIBLE */
-fetch("kjv.json")
+/* LOAD RAW JSON */
+fetch("bible.json")
 .then(res => res.json())
 .then(bible => {
 
-  // AUTO-CONVERT IF RAW FORMAT
-  if (Array.isArray(bible)) {
-    let formatted = {};
+  rawData = bible;
 
-    bible.forEach(v => {
-      let book = v.book;
-      let chapter = v.chapter - 1;
+  // CONVERT RAW FORMAT
+  bible.forEach(v => {
+    let book = v.book;
+    let chapter = v.chapter - 1;
 
-      if (!formatted[book]) formatted[book] = [];
-      if (!formatted[book][chapter]) formatted[book][chapter] = [];
+    if (!data[book]) data[book] = [];
+    if (!data[book][chapter]) data[book][chapter] = [];
 
-      formatted[book][chapter].push(v.text);
-    });
-
-    data = formatted;
-  } else {
-    data = bible;
-  }
+    data[book][chapter].push(v.text);
+  });
 
   showBooks();
 });
@@ -179,77 +190,62 @@ fetch("kjv.json")
 /* SHOW BOOKS */
 function showBooks() {
   state = "books";
-  document.getElementById("title").innerText = "Books";
-  let box = document.getElementById("list");
-  box.innerHTML = "";
+  title.innerText = "Books";
+
+  list.innerHTML = "";
+  viewer.innerHTML = "";
 
   Object.keys(data).forEach(book => {
     let div = document.createElement("div");
     div.className = "item";
     div.innerText = book;
     div.onclick = () => showChapters(book);
-    box.appendChild(div);
+    list.appendChild(div);
   });
-
-  document.getElementById("viewer").innerHTML = "";
 }
 
 /* CHAPTERS */
 function showChapters(book) {
   state = "chapters";
   currentBook = book;
-  document.getElementById("title").innerText = book;
 
-  let box = document.getElementById("list");
-  box.innerHTML = "";
+  title.innerText = book;
+  list.innerHTML = "";
+  viewer.innerHTML = "";
 
-  let chapters = data[book];
-
-  chapters.forEach((c, i) => {
+  data[book].forEach((c, i) => {
     let div = document.createElement("div");
     div.className = "item";
-    div.innerText = "Chapter " + (i + 1);
+    div.innerText = "Chapter " + (i+1);
     div.onclick = () => showVerses(book, i);
-    box.appendChild(div);
+    list.appendChild(div);
   });
 }
 
-/* VERSES */
+/* VERSES (FULL PAGE TEXT STYLE) */
 function showVerses(book, chapter) {
   state = "verses";
   currentChapter = chapter;
 
-  document.getElementById("title").innerText =
-    book + " " + (chapter + 1);
+  title.innerText = book + " " + (chapter+1);
+  list.innerHTML = "";
 
-  let viewer = document.getElementById("viewer");
-  viewer.innerHTML = "";
-
-  data[book][chapter].forEach((v, i) => {
-    let p = document.createElement("p");
-    p.innerHTML = "<b>" + (i+1) + "</b> " + v;
-    viewer.appendChild(p);
-  });
-
-  document.getElementById("list").innerHTML = "";
+  viewer.innerHTML = data[book][chapter]
+    .map((v,i)=> `<p><b>${i+1}</b> ${v}</p>`)
+    .join("");
 }
 
 /* BACK */
 function goBack() {
-  if (state === "verses") {
-    showChapters(currentBook);
-  } else if (state === "chapters") {
-    showBooks();
-  } else {
-    window.location.href = "index.html";
-  }
+  if (state === "verses") showChapters(currentBook);
+  else if (state === "chapters") showBooks();
+  else window.location.href = "index.html";
 }
 
 /* SEARCH */
-document.getElementById("search").addEventListener("input", e => {
+search.addEventListener("input", e => {
   let val = e.target.value.toLowerCase();
-  let box = document.getElementById("list");
-  box.innerHTML = "";
+  list.innerHTML = "";
 
   Object.keys(data).forEach(book => {
     if (book.toLowerCase().includes(val)) {
@@ -257,7 +253,7 @@ document.getElementById("search").addEventListener("input", e => {
       div.className = "item";
       div.innerText = book;
       div.onclick = () => showChapters(book);
-      box.appendChild(div);
+      list.appendChild(div);
     }
   });
 });
