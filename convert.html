@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+
+fetch("kjv.json")
+.then(res => res.json())
+.then(data => {
+
+  let bible = {};
+
+  data.forEach(v => {
+    let book = v.book;
+    let chapter = v.chapter - 1;
+
+    if (!bible[book]) bible[book] = [];
+    if (!bible[book][chapter]) bible[book][chapter] = [];
+
+    bible[book][chapter].push(v.text);
+  });
+
+  // DOWNLOAD FILE
+  const blob = new Blob([JSON.stringify(bible)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "bible.json";
+  a.click();
+
+});
+
+</script>
+</body>
+</html>
