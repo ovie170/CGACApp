@@ -1,7 +1,14 @@
 const fs = require("fs");
 
 // load raw file
-const data = JSON.parse(fs.readFileSync("kjv.json", "utf8"));
+const raw = fs.readFileSync("kjv.json", "utf8");
+let data = JSON.parse(raw);
+
+// 🔥 FIX: ensure data is an array
+if (!Array.isArray(data)) {
+  console.log("⚠️ Data is not an array, converting...");
+  data = Object.values(data);
+}
 
 let books = {};
 
@@ -29,7 +36,7 @@ fs.mkdirSync("bibles/kjv", { recursive: true });
 
 // convert + save
 for (let bookName in books) {
-  let cleanName = bookName.replace(/ /g, ""); // remove spaces
+  let cleanName = bookName.replace(/ /g, "");
 
   let formatted = {
     name: bookName,
