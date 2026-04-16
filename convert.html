@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html>
-<body>
+<body style="background:black;color:white;font-family:sans-serif;text-align:center;padding-top:50px;">
+
+<h2>Converting Bible...</h2>
+<p>Wait... it will download automatically</p>
+
 <script>
 
-fetch("kjv.json")
+fetch("raw_bible.json")
 .then(res => res.json())
 .then(data => {
 
@@ -19,9 +23,10 @@ fetch("kjv.json")
     bible[book][chapter].push(v.text);
   });
 
-  // DOWNLOAD FILE
-  const blob = new Blob([JSON.stringify(bible)], { type: "application/json" });
+  // DOWNLOAD NEW FILE
+  const blob = new Blob([JSON.stringify(bible)], {type: "application/json"});
   const a = document.createElement("a");
+
   a.href = URL.createObjectURL(blob);
   a.download = "bible.json";
   a.click();
@@ -29,5 +34,120 @@ fetch("kjv.json")
 });
 
 </script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<body style="background:black;color:white;font-family:sans-serif;text-align:center;padding-top:50px;">
+
+<h2>Converting Bible...</h2>
+<p>Wait... it will download automatically</p>
+
+<script>
+
+fetch("raw_bible.json")
+.then(res => res.json())
+.then(data => {
+
+  let bible = {};
+
+  data.forEach(v => {
+    let book = v.book;
+    let chapter = v.chapter - 1;
+
+    if (!bible[book]) bible[book] = [];
+    if (!bible[book][chapter]) bible[book][chapter] = [];
+
+    bible[book][chapter].push(v.text);
+  });
+
+  // DOWNLOAD NEW FILE
+  const blob = new Blob([JSON.stringify(bible)], {type: "application/json"});
+  const a = document.createElement("a");
+
+  a.href = URL.createObjectURL(blob);
+  a.download = "bible.json";
+  a.click();
+
+});
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<body style="background:black;color:white;font-family:sans-serif;text-align:center;padding-top:50px;">
+
+<h2>Converting Bible...</h2>
+<p>Wait... it will download automatically</p>
+
+<script>
+
+fetch("raw_bible.json")
+.then(res => res.json())
+.then(data => {
+
+  let bible = {};
+
+  data.forEach(v => {
+    let book = v.book;
+    let chapter = v.chapter - 1;
+
+    if (!bible[book]) bible[book] = [];
+    if (!bible[book][chapter]) bible[book][chapter] = [];
+
+    bible[book][chapter].push(v.text);
+  });
+
+  // DOWNLOAD NEW FILE
+  const blob = new Blob([JSON.stringify(bible)], {type: "application/json"});
+  const a = document.createElement("a");
+
+  a.href = URL.createObjectURL(blob);
+  a.download = "bible.json";
+  a.click();
+
+});
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<body style="background:black;color:white;font-family:sans-serif;text-align:center;padding-top:50px;">
+
+<h2>Converting Bible...</h2>
+<p>Wait... it will download automatically</p>
+
+<script>
+
+fetch("raw_bible.json")
+.then(res => res.json())
+.then(data => {
+
+  let bible = {};
+
+  data.forEach(v => {
+    let book = v.book;
+    let chapter = v.chapter - 1;
+
+    if (!bible[book]) bible[book] = [];
+    if (!bible[book][chapter]) bible[book][chapter] = [];
+
+    bible[book][chapter].push(v.text);
+  });
+
+  // DOWNLOAD NEW FILE
+  const blob = new Blob([JSON.stringify(bible)], {type: "application/json"});
+  const a = document.createElement("a");
+
+  a.href = URL.createObjectURL(blob);
+  a.download = "bible.json";
+  a.click();
+
+});
+
+</script>
+
 </body>
 </html>
