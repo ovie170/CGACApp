@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bible App</title>
+<title>CGAC Bible</title>
 
 <style>
 body {
@@ -11,6 +11,7 @@ body {
   font-family: Arial;
   background: linear-gradient(135deg, #2b1d0e, #120a05);
   color: white;
+  overflow-x: hidden;
 }
 
 /* Splash */
@@ -26,26 +27,36 @@ body {
   animation: fadeOut 3s forwards;
 }
 
+.bible {
+  font-size: 70px;
+  animation: glow 1.5s infinite alternate;
+}
+
+@keyframes glow {
+  from {text-shadow:0 0 10px gold}
+  to {text-shadow:0 0 50px white}
+}
+
 @keyframes fadeOut {
   0% {opacity:1}
   90% {opacity:1}
   100% {opacity:0; visibility:hidden}
 }
 
-.bible {
-  font-size: 60px;
-  animation: glow 1.5s infinite alternate;
-}
-
-@keyframes glow {
-  from {text-shadow:0 0 10px gold}
-  to {text-shadow:0 0 40px white}
+/* Watermark */
+.watermark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 120px;
+  opacity: 0.05;
+  animation: glow 4s infinite alternate;
+  pointer-events: none;
 }
 
 /* Header */
 .header {
-  display: flex;
-  justify-content: space-between;
   padding: 10px;
 }
 
@@ -53,42 +64,42 @@ body {
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(10px);
   border: none;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 10px 15px;
+  border-radius: 12px;
   color: white;
 }
 
 /* Search */
 .search-box {
-  margin: 10px;
+  margin: 15px;
   display: flex;
   position: relative;
 }
 
 .search-box input {
   flex: 1;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 20px;
   border: none;
   outline: none;
 }
 
 .search-btn {
   margin-left: 5px;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 20px;
   border: none;
   background: gold;
   cursor: pointer;
+  animation: glow 1.5s infinite alternate;
 }
 
-/* Star lights */
-.search-box::before,
-.search-box::after {
-  content: "✨✨✨";
+/* Star glow */
+.search-box::before {
+  content: "✨✨✨✨";
   position: absolute;
-  left: 10px;
-  top: -10px;
+  left: 20px;
+  top: -12px;
   animation: sparkle 2s infinite;
 }
 
@@ -98,7 +109,7 @@ body {
   100% {opacity:0}
 }
 
-/* Selectors */
+/* Select */
 .selector {
   display: flex;
   gap: 10px;
@@ -107,9 +118,12 @@ body {
 
 .selector select {
   flex: 1;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 15px;
   border: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  backdrop-filter: blur(10px);
 }
 
 /* Verses */
@@ -118,7 +132,8 @@ body {
 }
 
 .verse {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  line-height: 1.6;
 }
 
 .verse b {
@@ -137,12 +152,14 @@ body {
   <div class="bible">📖✝️</div>
 </div>
 
+<div class="watermark">✝️</div>
+
 <div class="header">
   <button class="back" onclick="history.back()">← Back</button>
 </div>
 
 <div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search verse...">
+  <input type="text" id="searchInput" placeholder="Search verse or number...">
   <button class="search-btn" onclick="searchVerse()">🔍</button>
 </div>
 
@@ -160,7 +177,8 @@ let currentVerses = [];
 fetch("bible.json")
 .then(res => res.json())
 .then(data => {
-  bibleData = data;
+  // Force your format even if single object
+  bibleData = Array.isArray(data) ? data : [data];
   loadBooks();
 });
 
@@ -216,14 +234,14 @@ function displayVerses() {
 function searchVerse() {
   const query = document.getElementById("searchInput").value.toLowerCase();
 
-  const filtered = currentVerses.filter(v => 
+  const results = currentVerses.filter(v => 
     v.text.toLowerCase().includes(query) || v.verse.toString() === query
   );
 
   const container = document.getElementById("bibleText");
   container.innerHTML = "";
 
-  filtered.forEach(v => {
+  results.forEach(v => {
     const p = document.createElement("p");
     p.className = "verse highlight";
     p.innerHTML = `<b>${v.verse}</b> ${v.text}`;
