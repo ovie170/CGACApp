@@ -3,238 +3,160 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CGAC Bible</title>
+<title>Bible</title>
 
 <style>
 body {
-  margin:0;
-  font-family: Georgia, serif;
-  background:#2b1b12;
-  color:white;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #2b1d0e, #1a1208);
+  color: #fff;
 }
 
-/* SPLASH SCREEN */
+/* Splash */
 #splash {
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:#2b1b12;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  background: #1a1208;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeOut 3s forwards;
 }
 
-.bible {
-  width:80px;
-  height:60px;
-  background:#fff;
-  position:relative;
-  animation:openBook 2s infinite alternate;
+@keyframes fadeOut {
+  0% {opacity:1}
+  80% {opacity:1}
+  100% {opacity:0; visibility:hidden}
 }
 
-.bible:before {
-  content:"";
-  position:absolute;
-  width:2px;
-  height:100%;
-  background:#2b1b12;
-  left:50%;
+.bible-icon {
+  font-size: 50px;
+  animation: glow 1.5s infinite alternate;
 }
 
-.cross {
-  width:20px;
-  height:20px;
-  position:absolute;
-  top:-30px;
+@keyframes glow {
+  from {text-shadow:0 0 10px gold}
+  to {text-shadow:0 0 30px white}
 }
 
-.cross:before, .cross:after {
-  content:"";
-  position:absolute;
-  background:#00aaff;
-}
-
-.cross:before { width:4px; height:20px; left:8px; }
-.cross:after { height:4px; width:20px; top:8px; }
-
-@keyframes openBook {
-  from { transform:scale(1) rotateY(0deg); }
-  to { transform:scale(1.1) rotateY(20deg); }
-}
-
-/* HEADER */
+/* Header */
 .header {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
 }
 
-.back {
-  background:rgba(255,255,255,0.1);
-  backdrop-filter:blur(10px);
-  padding:8px 12px;
-  border-radius:20px;
-  cursor:pointer;
+.back-btn {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
 }
 
-/* SEARCH */
+/* Search */
 .search-box {
-  margin:10px;
-  display:flex;
-  gap:10px;
+  display: flex;
+  margin: 10px;
 }
 
 .search-box input {
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:20px;
-  background:rgba(255,255,255,0.1);
-  color:white;
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
 }
 
-.search-box button {
-  padding:10px;
-  border:none;
-  border-radius:20px;
-  background:#00aaff;
-  color:white;
+.search-btn {
+  margin-left: 5px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: gold;
+  cursor: pointer;
+  animation: starGlow 1s infinite alternate;
 }
 
-/* LISTS */
-fetch("bible1.json")
-  .then(res => res.json())
-  .then(data => {
-    const chapter = data.Genesis["1"]; // Chapter 1
-
-    const container = document.getElementById("bibleText");
-    container.innerHTML = "";
-
-    chapter.forEach(v => {
-      const verseEl = document.createElement("p");
-      verseEl.innerHTML = `<b>${v.verse}</b> ${v.text}`;
-      container.appendChild(verseEl);
-    });
-  });
-
-.card {
-  background:rgba(255,255,255,0.1);
-  backdrop-filter:blur(8px);
-  padding:10px;
-  text-align:center;
-  border-radius:10px;
-  cursor:pointer;
+@keyframes starGlow {
+  from {box-shadow:0 0 5px gold}
+  to {box-shadow:0 0 20px white}
 }
 
-/* PASSAGE */
-.passage {
-  padding:15px;
-  line-height:1.8;
+/* Content */
+#bibleText {
+  padding: 15px;
 }
+
+.verse {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.verse b {
+  color: gold;
+}
+
+.highlight {
+  background: rgba(255,255,0,0.2);
+}
+
 </style>
 </head>
+
 <body>
 
 <div id="splash">
-  <div class="cross"></div>
-  <div class="bible"></div>
-  <h2>Opening Bible...</h2>
+  <div class="bible-icon">📖✝️</div>
 </div>
 
 <div class="header">
-  <div class="back" onclick="goBack()">← Back</div>
-  <h3>Holy Bible</h3>
+  <button class="back-btn" onclick="history.back()">← Back</button>
 </div>
 
 <div class="search-box">
-  <input id="search" placeholder="Search verse...">
-  <button onclick="searchBible()">Search</button>
+  <input type="text" id="searchInput" placeholder="Search verse...">
+  <button class="search-btn" onclick="searchVerse()">🔍</button>
 </div>
 
-<div id="books" class="grid"></div>
-<div id="chapters" class="grid"></div>
-<div id="passage" class="passage"></div>
+<div id="bibleText"></div>
 
 <script>
-let bible = {};
-let currentBook = null;
+let allVerses = [];
 
-// LOAD MULTIPLE FILES
-async function loadBible() {
-  for (let i = 1; i <= 5; i++) {
-    try {
-      let res = await fetch(`bible${i}.json`);
-      let data = await res.json();
-      Object.assign(bible, data);
-    } catch(e) {}
-  }
+fetch("bible1.json")
+.then(res => res.json())
+.then(data => {
+  const chapter = data.chapter ? data.verses : data.Genesis[0].verses || data.verses;
 
-  loadBooks();
-  document.getElementById('splash').style.display = 'none';
-}
+  allVerses = chapter;
+  displayVerses(chapter);
+});
 
-function loadBooks() {
-  let div = document.getElementById('books');
-  div.innerHTML = '';
+function displayVerses(verses) {
+  const container = document.getElementById("bibleText");
+  container.innerHTML = "";
 
-  Object.keys(bible).forEach(book => {
-    let d = document.createElement('div');
-    d.className = 'card';
-    d.innerText = book;
-    d.onclick = () => loadChapters(book);
-    div.appendChild(d);
+  verses.forEach(v => {
+    const p = document.createElement("p");
+    p.className = "verse";
+    p.innerHTML = `<b>${v.verse}</b> ${v.text}`;
+    container.appendChild(p);
   });
 }
 
-function loadChapters(book) {
-  currentBook = book;
-  let div = document.getElementById('chapters');
-  div.innerHTML = '';
+function searchVerse() {
+  const query = document.getElementById("searchInput").value.toLowerCase();
 
-  bible[book].forEach((ch, i) => {
-    let d = document.createElement('div');
-    d.className = 'card';
-    d.innerText = i + 1;
-    d.onclick = () => showChapter(i);
-    div.appendChild(d);
-  });
+  const filtered = allVerses.filter(v => 
+    v.text.toLowerCase().includes(query) || v.verse.toString() === query
+  );
+
+  displayVerses(filtered);
 }
-
-function showChapter(index) {
-  let text = '';
-  bible[currentBook][index].forEach((v, i) => {
-    text += `<b>${i+1}</b> ${v}<br><br>`;
-  });
-
-  document.getElementById('passage').innerHTML = text;
-}
-
-function searchBible() {
-  let q = document.getElementById('search').value.toLowerCase();
-  let result = '';
-
-  Object.keys(bible).forEach(book => {
-    bible[book].forEach((ch, ci) => {
-      ch.forEach((v, vi) => {
-        if (v.toLowerCase().includes(q)) {
-          result += `<b>${book} ${ci+1}:${vi+1}</b> ${v}<br><br>`;
-        }
-      });
-    });
-  });
-
-  document.getElementById('passage').innerHTML = result || 'No result found';
-}
-
-function goBack() {
-  document.getElementById('chapters').innerHTML = '';
-  document.getElementById('passage').innerHTML = '';
-}
-
-loadBible();
 </script>
 
 </body>
