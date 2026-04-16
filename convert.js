@@ -1,10 +1,14 @@
 const fs = require("fs");
 
 // load raw file
-const raw = fs.readFileSync("kjv.json", "utf8");
+let raw = fs.readFileSync("kjv.json", "utf8");
+
+// 🔥 REMOVE BOM (this fixes your error)
+raw = raw.replace(/^\uFEFF/, "");
+
 let data = JSON.parse(raw);
 
-// 🔥 FIX: ensure data is an array
+// ensure data is array
 if (!Array.isArray(data)) {
   console.log("⚠️ Data is not an array, converting...");
   data = Object.values(data);
