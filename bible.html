@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bible</title>
+<title>Bible App</title>
 
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #2b1d0e, #1a1208);
-  color: #fff;
+  font-family: Arial;
+  background: linear-gradient(135deg, #2b1d0e, #120a05);
+  color: white;
 }
 
 /* Splash */
@@ -18,28 +18,28 @@ body {
   position: fixed;
   width: 100%;
   height: 100vh;
-  background: #1a1208;
+  background: #120a05;
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 9999;
+  align-items: center;
+  z-index: 999;
   animation: fadeOut 3s forwards;
 }
 
 @keyframes fadeOut {
   0% {opacity:1}
-  80% {opacity:1}
+  90% {opacity:1}
   100% {opacity:0; visibility:hidden}
 }
 
-.bible-icon {
-  font-size: 50px;
+.bible {
+  font-size: 60px;
   animation: glow 1.5s infinite alternate;
 }
 
 @keyframes glow {
   from {text-shadow:0 0 10px gold}
-  to {text-shadow:0 0 30px white}
+  to {text-shadow:0 0 40px white}
 }
 
 /* Header */
@@ -49,7 +49,7 @@ body {
   padding: 10px;
 }
 
-.back-btn {
+.back {
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(10px);
   border: none;
@@ -60,40 +60,65 @@ body {
 
 /* Search */
 .search-box {
-  display: flex;
   margin: 10px;
+  display: flex;
+  position: relative;
 }
 
 .search-box input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+}
+
+.search-btn {
+  margin-left: 5px;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: gold;
+  cursor: pointer;
+}
+
+/* Star lights */
+.search-box::before,
+.search-box::after {
+  content: "✨✨✨";
+  position: absolute;
+  left: 10px;
+  top: -10px;
+  animation: sparkle 2s infinite;
+}
+
+@keyframes sparkle {
+  0% {opacity:0}
+  50% {opacity:1}
+  100% {opacity:0}
+}
+
+/* Selectors */
+.selector {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}
+
+.selector select {
   flex: 1;
   padding: 10px;
   border-radius: 10px;
   border: none;
 }
 
-.search-btn {
-  margin-left: 5px;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  background: gold;
-  cursor: pointer;
-  animation: starGlow 1s infinite alternate;
-}
-
-@keyframes starGlow {
-  from {box-shadow:0 0 5px gold}
-  to {box-shadow:0 0 20px white}
-}
-
-/* Content */
+/* Verses */
 #bibleText {
   padding: 15px;
 }
 
 .verse {
   margin-bottom: 10px;
-  line-height: 1.5;
 }
 
 .verse b {
@@ -103,18 +128,17 @@ body {
 .highlight {
   background: rgba(255,255,0,0.2);
 }
-
 </style>
 </head>
 
 <body>
 
 <div id="splash">
-  <div class="bible-icon">📖✝️</div>
+  <div class="bible">📖✝️</div>
 </div>
 
 <div class="header">
-  <button class="back-btn" onclick="history.back()">← Back</button>
+  <button class="back" onclick="history.back()">← Back</button>
 </div>
 
 <div class="search-box">
@@ -122,21 +146,62 @@ body {
   <button class="search-btn" onclick="searchVerse()">🔍</button>
 </div>
 
+<div class="selector">
+  <select id="bookSelect"></select>
+  <select id="chapterSelect"></select>
+</div>
+
 <div id="bibleText"></div>
 
 <script>
-let allVerses = [];
+let bibleData = [];
+let currentVerses = [];
 
-fetch("bible1.json")
+fetch("bible.json")
 .then(res => res.json())
 .then(data => {
-  const chapter = data.chapter ? data.verses : data.Genesis[0].verses || data.verses;
-
-  allVerses = chapter;
-  displayVerses(chapter);
+  bibleData = data;
+  loadBooks();
 });
 
-function displayVerses(verses) {
+function loadBooks() {
+  const bookSelect = document.getElementById("bookSelect");
+  bookSelect.innerHTML = "";
+
+  bibleData.forEach((book, index) => {
+    const opt = document.createElement("option");
+    opt.value = index;
+    opt.textContent = book.name;
+    bookSelect.appendChild(opt);
+  });
+
+  loadChapters();
+}
+
+function loadChapters() {
+  const bookIndex = document.getElementById("bookSelect").value;
+  const chapterSelect = document.getElementById("chapterSelect");
+  chapterSelect.innerHTML = "";
+
+  const chapters = bibleData[bookIndex].chapters;
+
+  chapters.forEach((ch, i) => {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = "Chapter " + ch.chapter;
+    chapterSelect.appendChild(opt);
+  });
+
+  displayVerses();
+}
+
+function displayVerses() {
+  const bookIndex = document.getElementById("bookSelect").value;
+  const chapterIndex = document.getElementById("chapterSelect").value;
+
+  const verses = bibleData[bookIndex].chapters[chapterIndex].verses;
+  currentVerses = verses;
+
   const container = document.getElementById("bibleText");
   container.innerHTML = "";
 
@@ -151,12 +216,24 @@ function displayVerses(verses) {
 function searchVerse() {
   const query = document.getElementById("searchInput").value.toLowerCase();
 
-  const filtered = allVerses.filter(v => 
+  const filtered = currentVerses.filter(v => 
     v.text.toLowerCase().includes(query) || v.verse.toString() === query
   );
 
-  displayVerses(filtered);
+  const container = document.getElementById("bibleText");
+  container.innerHTML = "";
+
+  filtered.forEach(v => {
+    const p = document.createElement("p");
+    p.className = "verse highlight";
+    p.innerHTML = `<b>${v.verse}</b> ${v.text}`;
+    container.appendChild(p);
+  });
 }
+
+// Events
+document.getElementById("bookSelect").addEventListener("change", loadChapters);
+document.getElementById("chapterSelect").addEventListener("change", displayVerses);
 </script>
 
 </body>
