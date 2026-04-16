@@ -6,263 +6,227 @@
 <title>CGAC Bible</title>
 
 <style>
-
-/* BACKGROUND */
 body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: #3b2a1f; /* deep brown */
-  color: #fff;
+  margin:0;
+  font-family: Georgia, serif;
+  background:#2b1b12;
+  color:white;
 }
 
-/* WATERMARK */
-body::before {
-  content: "";
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 250px;
-  height: 250px;
-  background: url('logo.png') center/contain no-repeat;
-  opacity: 0.05;
-  transform: translate(-50%, -50%);
-}
-
-/* SPLASH */
+/* SPLASH SCREEN */
 #splash {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: #3b2a1f;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  animation: fadeOut 2s ease forwards;
-  animation-delay: 2.5s;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:#2b1b12;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
 }
 
-.book {
-  width: 60px;
-  height: 40px;
-  border: 2px solid white;
-  border-radius: 4px;
-  position: relative;
-  animation: openBook 2s infinite alternate;
+.bible {
+  width:80px;
+  height:60px;
+  background:#fff;
+  position:relative;
+  animation:openBook 2s infinite alternate;
 }
 
-.book::after {
-  content: "+";
-  position: absolute;
-  top: -20px;
-  left: 18px;
-  font-size: 20px;
-  animation: glow 1.5s infinite alternate;
+.bible:before {
+  content:"";
+  position:absolute;
+  width:2px;
+  height:100%;
+  background:#2b1b12;
+  left:50%;
 }
+
+.cross {
+  width:20px;
+  height:20px;
+  position:absolute;
+  top:-30px;
+}
+
+.cross:before, .cross:after {
+  content:"";
+  position:absolute;
+  background:#00aaff;
+}
+
+.cross:before { width:4px; height:20px; left:8px; }
+.cross:after { height:4px; width:20px; top:8px; }
 
 @keyframes openBook {
-  from { transform: rotateY(0deg); }
-  to { transform: rotateY(20deg); }
-}
-
-@keyframes glow {
-  from { text-shadow: 0 0 5px white; }
-  to { text-shadow: 0 0 20px #0a84ff; }
-}
-
-@keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
+  from { transform:scale(1) rotateY(0deg); }
+  to { transform:scale(1.1) rotateY(20deg); }
 }
 
 /* HEADER */
-header {
-  display: flex;
-  align-items: center;
-  padding: 10px;
+.header {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
 }
 
-/* BACK BUTTON */
 .back {
-  padding: 8px 14px;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  background: rgba(255,255,255,0.1);
-  cursor: pointer;
-  margin-right: 10px;
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);
+  padding:8px 12px;
+  border-radius:20px;
+  cursor:pointer;
 }
 
 /* SEARCH */
 .search-box {
-  padding: 10px;
+  margin:10px;
+  display:flex;
+  gap:10px;
 }
 
 .search-box input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 25px;
-  border: none;
-  outline: none;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 10px rgba(255,255,255,0.2);
-  animation: starGlow 2s infinite alternate;
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:20px;
+  background:rgba(255,255,255,0.1);
+  color:white;
 }
 
-@keyframes starGlow {
-  from { box-shadow: 0 0 5px #fff; }
-  to { box-shadow: 0 0 20px #0a84ff; }
+.search-box button {
+  padding:10px;
+  border:none;
+  border-radius:20px;
+  background:#00aaff;
+  color:white;
 }
 
-/* LIST BOX (Books + Chapters ONLY) */
-.item {
-  margin: 8px 10px;
-  padding: 12px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(6px);
-  cursor: pointer;
+/* LISTS */
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
+  gap:8px;
+  padding:10px;
 }
 
-/* VERSES */
-#viewer {
-  padding: 15px;
+.card {
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(8px);
+  padding:10px;
+  text-align:center;
+  border-radius:10px;
+  cursor:pointer;
 }
 
-#viewer p {
-  line-height: 1.6;
-  margin-bottom: 10px;
+/* PASSAGE */
+.passage {
+  padding:15px;
+  line-height:1.8;
 }
-
 </style>
 </head>
-
 <body>
 
-<!-- SPLASH -->
 <div id="splash">
-  <div class="book"></div>
-  <p>Opening Bible...</p>
+  <div class="cross"></div>
+  <div class="bible"></div>
+  <h2>Opening Bible...</h2>
 </div>
 
-<header>
-  <div class="back" onclick="goBack()">←</div>
-  <h3 id="title">Bible (KJV)</h3>
-</header>
+<div class="header">
+  <div class="back" onclick="goBack()">← Back</div>
+  <h3>Holy Bible</h3>
+</div>
 
 <div class="search-box">
-  <input type="text" id="search" placeholder="Search book...">
+  <input id="search" placeholder="Search verse...">
+  <button onclick="searchBible()">Search</button>
 </div>
 
-<div id="list"></div>
-<div id="viewer"></div>
+<div id="books" class="grid"></div>
+<div id="chapters" class="grid"></div>
+<div id="passage" class="passage"></div>
 
 <script>
+let bible = {};
+let currentBook = null;
 
-let rawData = [];
-let data = {};
-let state = "books";
-let currentBook = "";
-let currentChapter = 0;
+// LOAD MULTIPLE FILES
+async function loadBible() {
+  for (let i = 1; i <= 5; i++) {
+    try {
+      let res = await fetch(`bible${i}.json`);
+      let data = await res.json();
+      Object.assign(bible, data);
+    } catch(e) {}
+  }
 
-/* LOAD RAW JSON */
-fetch("bible.json")
-.then(res => res.json())
-.then(bible => {
+  loadBooks();
+  document.getElementById('splash').style.display = 'none';
+}
 
-  rawData = bible;
+function loadBooks() {
+  let div = document.getElementById('books');
+  div.innerHTML = '';
 
-  // CONVERT RAW FORMAT
-  bible.forEach(v => {
-    let book = v.book;
-    let chapter = v.chapter - 1;
-
-    if (!data[book]) data[book] = [];
-    if (!data[book][chapter]) data[book][chapter] = [];
-
-    data[book][chapter].push(v.text);
-  });
-
-  showBooks();
-});
-
-/* SHOW BOOKS */
-function showBooks() {
-  state = "books";
-  title.innerText = "Books";
-
-  list.innerHTML = "";
-  viewer.innerHTML = "";
-
-  Object.keys(data).forEach(book => {
-    let div = document.createElement("div");
-    div.className = "item";
-    div.innerText = book;
-    div.onclick = () => showChapters(book);
-    list.appendChild(div);
+  Object.keys(bible).forEach(book => {
+    let d = document.createElement('div');
+    d.className = 'card';
+    d.innerText = book;
+    d.onclick = () => loadChapters(book);
+    div.appendChild(d);
   });
 }
 
-/* CHAPTERS */
-function showChapters(book) {
-  state = "chapters";
+function loadChapters(book) {
   currentBook = book;
+  let div = document.getElementById('chapters');
+  div.innerHTML = '';
 
-  title.innerText = book;
-  list.innerHTML = "";
-  viewer.innerHTML = "";
-
-  data[book].forEach((c, i) => {
-    let div = document.createElement("div");
-    div.className = "item";
-    div.innerText = "Chapter " + (i+1);
-    div.onclick = () => showVerses(book, i);
-    list.appendChild(div);
+  bible[book].forEach((ch, i) => {
+    let d = document.createElement('div');
+    d.className = 'card';
+    d.innerText = i + 1;
+    d.onclick = () => showChapter(i);
+    div.appendChild(d);
   });
 }
 
-/* VERSES (FULL PAGE TEXT STYLE) */
-function showVerses(book, chapter) {
-  state = "verses";
-  currentChapter = chapter;
+function showChapter(index) {
+  let text = '';
+  bible[currentBook][index].forEach((v, i) => {
+    text += `<b>${i+1}</b> ${v}<br><br>`;
+  });
 
-  title.innerText = book + " " + (chapter+1);
-  list.innerHTML = "";
-
-  viewer.innerHTML = data[book][chapter]
-    .map((v,i)=> `<p><b>${i+1}</b> ${v}</p>`)
-    .join("");
+  document.getElementById('passage').innerHTML = text;
 }
 
-/* BACK */
+function searchBible() {
+  let q = document.getElementById('search').value.toLowerCase();
+  let result = '';
+
+  Object.keys(bible).forEach(book => {
+    bible[book].forEach((ch, ci) => {
+      ch.forEach((v, vi) => {
+        if (v.toLowerCase().includes(q)) {
+          result += `<b>${book} ${ci+1}:${vi+1}</b> ${v}<br><br>`;
+        }
+      });
+    });
+  });
+
+  document.getElementById('passage').innerHTML = result || 'No result found';
+}
+
 function goBack() {
-  if (state === "verses") showChapters(currentBook);
-  else if (state === "chapters") showBooks();
-  else window.location.href = "index.html";
+  document.getElementById('chapters').innerHTML = '';
+  document.getElementById('passage').innerHTML = '';
 }
 
-/* SEARCH */
-search.addEventListener("input", e => {
-  let val = e.target.value.toLowerCase();
-  list.innerHTML = "";
-
-  Object.keys(data).forEach(book => {
-    if (book.toLowerCase().includes(val)) {
-      let div = document.createElement("div");
-      div.className = "item";
-      div.innerText = book;
-      div.onclick = () => showChapters(book);
-      list.appendChild(div);
-    }
-  });
-});
-
-/* OFFLINE */
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
-
+loadBible();
 </script>
 
 </body>
