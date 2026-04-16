@@ -105,12 +105,20 @@ body {
 }
 
 /* LISTS */
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
-  gap:8px;
-  padding:10px;
-}
+fetch("bible1.json")
+  .then(res => res.json())
+  .then(data => {
+    const chapter = data.Genesis["1"]; // Chapter 1
+
+    const container = document.getElementById("bibleText");
+    container.innerHTML = "";
+
+    chapter.forEach(v => {
+      const verseEl = document.createElement("p");
+      verseEl.innerHTML = `<b>${v.verse}</b> ${v.text}`;
+      container.appendChild(verseEl);
+    });
+  });
 
 .card {
   background:rgba(255,255,255,0.1);
