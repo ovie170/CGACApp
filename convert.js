@@ -3,52 +3,40 @@ const fs = require("fs");
 // load raw file
 let raw = fs.readFileSync("kjv.json", "utf8");
 
-// 🔥 REMOVE BOM (this fixes your error)
+// remove BOM
 raw = raw.replace(/^\uFEFF/, "");
 
-let data = JSON.parse(raw);
-
-// ensure data is array
-if (!Array.isArray(data)) {
-  console.log("⚠️ Data is not an array, converting...");
-  data = Object.values(data);
-}
-
-let books = {};
-
-// organize data
-data.forEach(v => {
-  if (!books[v.book]) {
-    books[v.book] = {
-      name: v.book,
-      chapters: {}
-    };
-  }
-
-  if (!books[v.book].chapters[v.chapter]) {
-    books[v.book].chapters[v.chapter] = [];
-  }
-
-  books[v.book].chapters[v.chapter].push({
-    verse: v.verse,
-    text: v.text
-  });
-});
+const data = JSON.parse(raw);
 
 // create folder
 fs.mkdirSync("bibles/kjv", { recursive: true });
 
-// convert + save
-for (let bookName in books) {
-  let cleanName = bookName.replace(/ /g, "");
+// loop through books
+for (let bookName in data) {
+  let chapters = [];
+
+  for (let chapterNum in data[bookName]) {
+    let verses = [];
+
+    for (let verseNum in data[bookName][chapterNum]) {
+      verses.push({
+        verse: Number(verseNum),
+        text: data[bookName][chapterNum][verseNum]
+      });
+    }
+
+    chapters.push({
+      chapter: Number(chapterNum),
+      verses: verses
+    });
+  }
 
   let formatted = {
     name: bookName,
-    chapters: Object.keys(books[bookName].chapters).map(ch => ({
-      chapter: Number(ch),
-      verses: books[bookName].chapters[ch]
-    }))
+    chapters: chapters
   };
+
+  let cleanName = bookName.replace(/ /g, "");
 
   fs.writeFileSync(
     `bibles/kjv/${cleanName}.json`,
@@ -56,4 +44,4 @@ for (let bookName in books) {
   );
 }
 
-console.log("✅ All 66 books created perfectly!");
+console.log("✅ All books created correctly!");
