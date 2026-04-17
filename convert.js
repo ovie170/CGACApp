@@ -3,51 +3,51 @@ const fs = require("fs");
 // load file
 let raw = fs.readFileSync("kjv.json", "utf8");
 
-// remove BOM (important)
+// remove BOM
 raw = raw.replace(/^\uFEFF/, "");
 
 const data = JSON.parse(raw);
 
-// target books
-const booksData = data.books;
-
-// create folder
+// ✅ your file is an ARRAY of books
 fs.mkdirSync("bible/kjv", { recursive: true });
 
-// loop through books
-for (let bookName in booksData) {
+data.forEach((bookObj) => {
+
   let chapters = [];
 
-  for (let chapterNum in booksData[bookName]) {
+  bookObj.chapters.forEach((ch) => {
+
     let verses = [];
 
-    for (let verseNum in booksData[bookName][chapterNum]) {
+    ch.verses.forEach((v) => {
       verses.push({
-        verse: Number(verseNum),
-        text: booksData[bookName][chapterNum][verseNum]
+        verse: Number(v.verse),
+        text: v.text
       });
-    }
+    });
 
     chapters.push({
-      chapter: Number(chapterNum),
+      chapter: Number(ch.chapter),
       verses: verses
     });
-  }
 
-  // ✅ FIXED FORMAT
+  });
+
+  // ✅ CORRECT FORMAT
   let formatted = {
-    book: bookName,
+    book: bookObj.name,     // NOT number
     version: "KJV",
     chapters: chapters
   };
 
-  // clean file name
-  let cleanName = bookName.toLowerCase().replace(/\s+/g, "");
+  // clean filename
+  let cleanName = bookObj.name.toLowerCase().replace(/\s+/g, "");
 
   fs.writeFileSync(
     `bible/kjv/${cleanName}.json`,
     JSON.stringify(formatted, null, 2)
   );
-}
 
-console.log("✅ All 66 books converted PERFECTLY!");
+});
+
+console.log("✅ FIXED: All books now correct format!");
