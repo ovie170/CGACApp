@@ -1,31 +1,70 @@
 const fs = require("fs");
 const path = require("path");
 
-// load kjv.json
-const data = JSON.parse(fs.readFileSync("kjv.json", "utf-8"));
+// ===== CONFIG =====
+const INPUT_FILE = "kjv.json";
+const OUTPUT_DIR = path.join(__dirname, "bibles", "kjv");
 
-// output folder
-const outputDir = path.join(__dirname, "bibles", "kjv");
+// ===== READ + CLEAN FILE =====
+function loadJSON(file) {
+  let raw = fs.readFileSync(file);
 
-// create folder if not exists
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir, { recursive: true });
+  // convert buffer → string
+  raw = raw.toString("utf8");
+
+  // remove BOM
+  raw = raw.replace(/^\uFEFF/, "");
+
+  // remove anything before first {
+  raw = raw.slice(raw.indexOf("{"));
+
+  return JSON.parse(raw);
 }
 
-// loop through books
-data.books.forEach(book => {
-  const bookName = book.name;
+// ===== NORMALIZE BOOK NAME =====
+function normalizeBookName(name) {
+  return name.replace(/\s+/g, ""); // remove spaces (e.g. "1 Samuel" → "1Samuel")
+}
 
-  const newBook = {
-    book: bookName,
-    chapters: book.chapters
-  };
+// ===== MAIN =====
+function convert() {
+  console.log("📖 Loading KJV...");
 
-  const filePath = path.join(outputDir, `${bookName}.json`);
+  const data = loadJSON(INPUT_FILE);
 
-  fs.writeFileSync(filePath, JSON.stringify(newBook, null, 2));
+  if (!data.books || !Array.isArray(data.books)) {
+    throw new Error("❌ Invalid KJV format: 'books' array missing");
+  }
 
-  console.log(`✅ Created: ${bookName}.json`);
-});
+  // create output folder
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
 
-console.log("🎉 All books converted!");
+  console.log(`📚 Found ${data.books.length} books`);
+
+  data.books.forEach((book, index) => {
+    const safeName = normalizeBookName(book.name);
+
+    const newBook = {
+      book: book.name,
+      chapters: book.chapters.map(ch => ({
+        chapter: ch.chapter,
+        verses: ch.verses.map(v => ({
+          verse: v.verse,
+          text: v.text.trim()
+        }))
+      }))
+    };
+
+    const filePath = path.join(OUTPUT_DIR, `${safeName}.json`);
+
+    fs.writeFileSync(filePath, JSON.stringify(newBook, null, 2));
+
+    console.log(`✅ ${index + 1}/66 → ${safeName}.json`);
+  });
+
+  console.log("🎉 Conversion complete!");
+}
+
+convert();
