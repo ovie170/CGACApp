@@ -1,191 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Bible App</title>
+<meta charset="UTF-8">
+<title>Holy Bible</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f5f5f5;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #87ceeb, #e0f7ff);
+  overflow-x: hidden;
+}
 
-    header {
-      background: #222;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
+/* SPLASH */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #4facfe, #00c6ff);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 999;
+  animation: fadeOut 2s ease forwards;
+  animation-delay: 2s;
+}
 
-    .controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding: 15px;
-      background: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+#splash h1 {
+  font-size: 40px;
+  animation: zoom 2s infinite alternate;
+}
 
-    select, button {
-      padding: 8px 12px;
-      font-size: 14px;
-      cursor: pointer;
-    }
+@keyframes zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
 
-    #bible {
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
-      background: #fff;
-      margin-top: 10px;
-      border-radius: 8px;
-    }
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
 
-    h2 {
-      text-align: center;
-    }
+/* GLASS STYLE */
+.glass {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+}
 
-    p {
-      line-height: 1.6;
-    }
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
 
-    b {
-      color: #555;
-    }
-  </style>
+/* BUTTON */
+button, select, input {
+  border: none;
+  outline: none;
+}
+
+/* WATERMARK */
+#watermark {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  opacity: 0.1;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+/* CONTENT */
+#content {
+  max-width: 800px;
+  margin: auto;
+  padding: 15px;
+}
+
+/* VERSES */
+#bible p {
+  line-height: 1.7;
+}
+</style>
 </head>
 
 <body>
 
-<header>
-  <h1>📖 Bible</h1>
-</header>
-
-<div class="controls">
-  <select id="bookSelect" onchange="changeBook(this.value)">
-    <option>Genesis</option>
-    <option>Exodus</option>
-    <option>Leviticus</option>
-    <option>Numbers</option>
-    <option>Deuteronomy</option>
-    <option>Joshua</option>
-    <option>Judges</option>
-    <option>Ruth</option>
-    <option>1Samuel</option>
-    <option>2Samuel</option>
-    <option>1Kings</option>
-    <option>2Kings</option>
-    <option>1Chronicles</option>
-    <option>2Chronicles</option>
-    <option>Ezra</option>
-    <option>Nehemiah</option>
-    <option>Esther</option>
-    <option>Job</option>
-    <option>Psalms</option>
-    <option>Proverbs</option>
-    <option>Ecclesiastes</option>
-    <option>SongOfSolomon</option>
-    <option>Isaiah</option>
-    <option>Jeremiah</option>
-    <option>Lamentations</option>
-    <option>Ezekiel</option>
-    <option>Daniel</option>
-    <option>Hosea</option>
-    <option>Joel</option>
-    <option>Amos</option>
-    <option>Obadiah</option>
-    <option>Jonah</option>
-    <option>Micah</option>
-    <option>Nahum</option>
-    <option>Habakkuk</option>
-    <option>Zephaniah</option>
-    <option>Haggai</option>
-    <option>Zechariah</option>
-    <option>Malachi</option>
-    <option>Matthew</option>
-    <option>Mark</option>
-    <option>Luke</option>
-    <option>John</option>
-    <option>Acts</option>
-    <option>Romans</option>
-    <option>1Corinthians</option>
-    <option>2Corinthians</option>
-    <option>Galatians</option>
-    <option>Ephesians</option>
-    <option>Philippians</option>
-    <option>Colossians</option>
-    <option>1Thessalonians</option>
-    <option>2Thessalonians</option>
-    <option>1Timothy</option>
-    <option>2Timothy</option>
-    <option>Titus</option>
-    <option>Philemon</option>
-    <option>Hebrews</option>
-    <option>James</option>
-    <option>1Peter</option>
-    <option>2Peter</option>
-    <option>1John</option>
-    <option>2John</option>
-    <option>3John</option>
-    <option>Jude</option>
-    <option>Revelation</option>
-  </select>
-
-  <button onclick="prevChapter()">⬅ Prev</button>
-  <button onclick="nextChapter()">Next ➡</button>
+<!-- SPLASH -->
+<div id="splash">
+  <h1>📖 Holy Bible</h1>
+  <p>KJV Version</p>
 </div>
 
-<div id="bible">Loading...</div>
+<!-- WATERMARK -->
+<img src="logo.png" id="watermark">
+
+<!-- HEADER -->
+<div class="header">
+  <button class="glass">⬅ Back</button>
+
+  <select class="glass" id="version">
+    <option value="kjv">KJV</option>
+  </select>
+</div>
+
+<!-- CONTROLS -->
+<div id="content">
+
+  <div class="glass">
+    <input type="text" placeholder="🔍 Search..." style="width:70%">
+    <button class="glass">Search</button>
+  </div>
+
+  <br>
+
+  <div class="glass">
+    <select id="bookSelect" onchange="changeBook(this.value)">
+      <option>Genesis</option>
+      <option>Exodus</option>
+      <option>Leviticus</option>
+      <option>Numbers</option>
+      <option>Deuteronomy</option>
+      <!-- you can keep adding -->
+    </select>
+
+    <button onclick="prevChapter()">⬅</button>
+    <button onclick="nextChapter()">➡</button>
+  </div>
+
+  <br>
+
+  <!-- VERSES -->
+  <div id="bible" class="glass">Loading...</div>
+
+</div>
 
 <script>
 let currentBook = "Genesis";
 let currentChapter = 1;
-let version = "kjv";
 
-// load book
 async function loadBook() {
   try {
-    const res = await fetch(`bibles/${version}/${currentBook}.json`);
+    const res = await fetch(`bibles/kjv/${currentBook}.json`);
+
+    if (!res.ok) throw new Error("File not found");
+
     const data = await res.json();
 
     displayChapter(data);
+
   } catch (err) {
-    document.getElementById("bible").innerHTML = "❌ Failed to load book";
+    document.getElementById("bible").innerHTML =
+      "❌ Cannot load book. Check file path.";
     console.error(err);
   }
 }
 
-// display chapter
 function displayChapter(data) {
   const container = document.getElementById("bible");
 
-  const chapterData = data.chapters.find(
-    ch => ch.chapter === currentChapter
+  const chapter = data.chapters.find(
+    c => c.chapter === currentChapter
   );
 
-  if (!chapterData) {
+  if (!chapter) {
     container.innerHTML = "Chapter not found";
     return;
   }
 
   let html = `<h2>${data.book} ${currentChapter}</h2>`;
 
-  chapterData.verses.forEach(v => {
+  chapter.verses.forEach(v => {
     html += `<p><b>${v.verse}</b> ${v.text}</p>`;
   });
 
   container.innerHTML = html;
 }
 
-// change book
 function changeBook(book) {
   currentBook = book;
   currentChapter = 1;
   loadBook();
 }
 
-// navigation
 function nextChapter() {
   currentChapter++;
   loadBook();
@@ -198,7 +199,6 @@ function prevChapter() {
   }
 }
 
-// start
 loadBook();
 </script>
 
