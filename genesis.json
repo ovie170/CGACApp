@@ -1,6 +1,9 @@
 {
-      "chapter": 1,
-      "verses": [
+     {
+  "book": "Genesis",
+  "version": "KJV",
+  "chapters": [...]
+}
         {
           "verse": 0,
           "text": {
