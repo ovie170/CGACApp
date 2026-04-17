@@ -8,46 +8,51 @@ raw = raw.replace(/^\uFEFF/, "");
 
 const data = JSON.parse(raw);
 
-// ✅ your file is an ARRAY of books
+// 🔥 correct root
+const booksData = data.books;
+
+// create folder
 fs.mkdirSync("bible/kjv", { recursive: true });
 
-data.forEach((bookObj) => {
+// loop books
+for (let bookName in booksData) {
 
   let chapters = [];
 
-  bookObj.chapters.forEach((ch) => {
+  let book = booksData[bookName];
+
+  for (let chapterNum in book) {
 
     let verses = [];
 
-    ch.verses.forEach((v) => {
+    let chapter = book[chapterNum];
+
+    for (let verseNum in chapter) {
       verses.push({
-        verse: Number(v.verse),
-        text: v.text
+        verse: Number(verseNum),
+        text: chapter[verseNum]
       });
-    });
+    }
 
     chapters.push({
-      chapter: Number(ch.chapter),
+      chapter: Number(chapterNum),
       verses: verses
     });
+  }
 
-  });
-
-  // ✅ CORRECT FORMAT
+  // ✅ FINAL FORMAT
   let formatted = {
-    book: bookObj.name,     // NOT number
+    book: bookName,
     version: "KJV",
     chapters: chapters
   };
 
-  // clean filename
-  let cleanName = bookObj.name.toLowerCase().replace(/\s+/g, "");
+  let cleanName = bookName.toLowerCase().replace(/\s+/g, "");
 
   fs.writeFileSync(
     `bible/kjv/${cleanName}.json`,
     JSON.stringify(formatted, null, 2)
   );
+}
 
-});
-
-console.log("✅ FIXED: All books now correct format!");
+console.log("✅ PERFECT: All books converted correctly!");
