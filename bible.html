@@ -145,7 +145,7 @@ let currentChapter = 1;
 
 async function loadBook() {
   try {
-    const res = await fetch(`bibles/kjv/${currentBook}.json`);
+    const res = await fetch(${currentBook}.json`);
 
     if (!res.ok) throw new Error("File not found");
 
