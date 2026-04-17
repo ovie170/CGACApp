@@ -1,41 +1,5 @@
 {
-  "name": "0",
-  "chapters": [
-    {
-      "chapter": null,
-      "verses": [
-        {
-          "verse": 0,
-          "text": "G"
-        },
-        {
-          "verse": 1,
-          "text": "e"
-        },
-        {
-          "verse": 2,
-          "text": "n"
-        },
-        {
-          "verse": 3,
-          "text": "e"
-        },
-        {
-          "verse": 4,
-          "text": "s"
-        },
-        {
-          "verse": 5,
-          "text": "i"
-        },
-        {
-          "verse": 6,
-          "text": "s"
-        }
-      ]
-    },
-    {
-      "chapter": null,
+      "chapter": Genesis,
       "verses": [
         {
           "verse": 0,
