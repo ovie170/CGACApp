@@ -1,40 +1,31 @@
 const fs = require("fs");
+const path = require("path");
 
-const raw = fs.readFileSync("kjv_fixed.json", "utf8");
-const data = JSON.parse(raw);
+// load kjv.json
+const data = JSON.parse(fs.readFileSync("kjv.json", "utf-8"));
 
-fs.mkdirSync("bibles/kjv", { recursive: true });
+// output folder
+const outputDir = path.join(__dirname, "bibles", "kjv");
 
-for (let bookName in data) {
-  let chapters = [];
-
-  for (let chapterNum in data[bookName]) {
-    let verses = [];
-
-    for (let verseNum in data[bookName][chapterNum]) {
-      verses.push({
-        verse: Number(verseNum),
-        text: data[bookName][chapterNum][verseNum]
-      });
-    }
-
-    chapters.push({
-      chapter: Number(chapterNum),
-      verses: verses
-    });
-  }
-
-  let formatted = {
-    name: bookName,
-    chapters: chapters
-  };
-
-  let cleanName = bookName.replace(/ /g, "");
-
-  fs.writeFileSync(
-    `bibles/kjv/${cleanName}.json`,
-    JSON.stringify(formatted, null, 2)
-  );
+// create folder if not exists
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
 }
 
-console.log("✅ DONE!");
+// loop through books
+data.books.forEach(book => {
+  const bookName = book.name;
+
+  const newBook = {
+    book: bookName,
+    chapters: book.chapters
+  };
+
+  const filePath = path.join(outputDir, `${bookName}.json`);
+
+  fs.writeFileSync(filePath, JSON.stringify(newBook, null, 2));
+
+  console.log(`✅ Created: ${bookName}.json`);
+});
+
+console.log("🎉 All books converted!");
