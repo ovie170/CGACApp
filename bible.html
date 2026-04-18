@@ -2,89 +2,118 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Holy Bible</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #87ceeb, #e0f7ff);
-  overflow-x: hidden;
+body{
+  margin:0;
+  font-family: Georgia, serif;
+  background:#f4e4b8; /* milky gold */
+  overflow-x:hidden;
 }
 
 /* SPLASH */
-#splash {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(135deg, #4facfe, #00c6ff);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  z-index: 999;
-  animation: fadeOut 2s ease forwards;
-  animation-delay: 2s;
+#splash{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:9999;
 }
 
-#splash h1 {
-  font-size: 40px;
-  animation: zoom 2s infinite alternate;
+#splash h1{
+  color:gold;
+  font-size:40px;
+  text-shadow:0 0 20px gold,0 0 40px gold;
+  animation:glow 2s infinite alternate;
 }
 
-@keyframes zoom {
-  from { transform: scale(1); }
-  to { transform: scale(1.1); }
+@keyframes glow{
+  from{opacity:0.7}
+  to{opacity:1}
 }
 
-@keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
-}
-
-/* GLASS STYLE */
-.glass {
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 10px;
-  border: 1px solid rgba(255,255,255,0.3);
+/* GLASS */
+.glass{
+  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,0.2);
+  border-radius:15px;
+  padding:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
 /* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
+#top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
 }
 
-/* BUTTON */
-button, select, input {
-  border: none;
-  outline: none;
+#backBtn{
+  cursor:pointer;
+}
+
+/* SEARCH */
+#searchBox{
+  display:flex;
+  gap:10px;
+  margin:10px;
+}
+
+input{
+  flex:1;
+  padding:10px;
+  border:none;
+  outline:none;
+  border-radius:10px;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+/* BOOKS */
+#books{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:10px;
+}
+
+.book{
+  text-align:center;
+  padding:15px;
+  cursor:pointer;
+}
+
+/* CHAPTERS */
+#chapters, #verses{
+  padding:10px;
+}
+
+.chapterBtn{
+  margin:5px;
 }
 
 /* WATERMARK */
-#watermark {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  opacity: 0.1;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
+#watermark{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  opacity:0.05;
+  width:250px;
 }
 
-/* CONTENT */
-#content {
-  max-width: 800px;
-  margin: auto;
-  padding: 15px;
-}
-
-/* VERSES */
-#bible p {
-  line-height: 1.7;
-}
 </style>
 </head>
 
@@ -92,114 +121,124 @@ button, select, input {
 
 <!-- SPLASH -->
 <div id="splash">
-  <h1>📖 Holy Bible</h1>
-  <p>KJV Version</p>
+  <h1>HOLY BIBLE</h1>
 </div>
 
-<!-- WATERMARK -->
 <img src="logo.png" id="watermark">
 
-<!-- HEADER -->
-<div class="header">
-  <button class="glass">⬅ Back</button>
-
-  <select class="glass" id="version">
-    <option value="kjv">KJV</option>
-  </select>
+<div id="top" class="glass">
+  <button id="backBtn" onclick="goBack()">⬅</button>
+  <h3 id="title">Bible</h3>
 </div>
 
-<!-- CONTROLS -->
-<div id="content">
-
-  <div class="glass">
-    <input type="text" placeholder="🔍 Search..." style="width:70%">
-    <button class="glass">Search</button>
-  </div>
-
-  <br>
-
-  <div class="glass">
-    <select id="bookSelect" onchange="changeBook(this.value)">
-      <option>Genesis</option>
-      <option>Exodus</option>
-      <option>Leviticus</option>
-      <option>Numbers</option>
-      <option>Deuteronomy</option>
-      <!-- you can keep adding -->
-    </select>
-
-    <button onclick="prevChapter()">⬅</button>
-    <button onclick="nextChapter()">➡</button>
-  </div>
-
-  <br>
-
-  <!-- VERSES -->
-  <div id="bible" class="glass">Loading...</div>
-
+<div id="searchBox" class="glass">
+  <input type="text" id="searchInput" placeholder="Search verse...">
+  <button onclick="search()">Search</button>
 </div>
+
+<div id="books"></div>
+<div id="chapters"></div>
+<div id="verses"></div>
 
 <script>
-let currentBook = "Genesis";
-let currentChapter = 1;
 
-async function loadBook() {
-  try {
-    const res = await fetch(${currentBook}.json`);
+// SPLASH
+setTimeout(()=>{
+  document.getElementById('splash').style.display='none';
+},5000);
 
-    if (!res.ok) throw new Error("File not found");
+// ONLY GENESIS (for now)
+const books=["Genesis"];
 
-    const data = await res.json();
+let currentBookData=null;
+let historyStack=[];
 
-    displayChapter(data);
+// LOAD BOOK LIST
+function loadBooks(){
+  let container=document.getElementById('books');
+  container.innerHTML="";
 
-  } catch (err) {
-    document.getElementById("bible").innerHTML =
-      "❌ Cannot load book. Check file path.";
-    console.error(err);
-  }
+  books.forEach(b=>{
+    let div=document.createElement('div');
+    div.className="book glass";
+    div.innerText=b;
+
+    div.onclick=()=>loadBook(b);
+
+    container.appendChild(div);
+  });
 }
 
-function displayChapter(data) {
-  const container = document.getElementById("bible");
+// LOAD BOOK JSON
+async function loadBook(book){
+  let res=await fetch(book+".json");
+  let data=await res.json();
 
-  const chapter = data.chapters.find(
-    c => c.chapter === currentChapter
-  );
+  currentBookData=data;
 
-  if (!chapter) {
-    container.innerHTML = "Chapter not found";
-    return;
-  }
+  document.getElementById('title').innerText=data.book;
 
-  let html = `<h2>${data.book} ${currentChapter}</h2>`;
+  document.getElementById('books').innerHTML="";
+  document.getElementById('verses').innerHTML="";
 
-  chapter.verses.forEach(v => {
-    html += `<p><b>${v.verse}</b> ${v.text}</p>`;
+  let chaptersDiv=document.getElementById('chapters');
+  chaptersDiv.innerHTML="";
+
+  data.chapters.forEach(ch=>{
+    let btn=document.createElement('button');
+    btn.className="chapterBtn glass";
+    btn.innerText="Chapter "+ch.chapter;
+
+    btn.onclick=()=>showChapter(ch);
+
+    chaptersDiv.appendChild(btn);
   });
 
-  container.innerHTML = html;
+  historyStack.push('books');
 }
 
-function changeBook(book) {
-  currentBook = book;
-  currentChapter = 1;
-  loadBook();
+// SHOW CHAPTER
+function showChapter(ch){
+  let versesDiv=document.getElementById('verses');
+  versesDiv.innerHTML="";
+
+  document.getElementById('chapters').innerHTML="";
+
+  ch.verses.forEach(v=>{
+    let p=document.createElement('p');
+    p.innerHTML="<b>"+v.verse+"</b> "+v.text;
+    versesDiv.appendChild(p);
+  });
+
+  historyStack.push('chapters');
 }
 
-function nextChapter() {
-  currentChapter++;
-  loadBook();
+// BACK BUTTON
+function goBack(){
+  location.reload();
 }
 
-function prevChapter() {
-  if (currentChapter > 1) {
-    currentChapter--;
-    loadBook();
-  }
+// SEARCH
+function search(){
+  let q=document.getElementById('searchInput').value.toLowerCase();
+  if(!currentBookData) return;
+
+  let versesDiv=document.getElementById('verses');
+  versesDiv.innerHTML="";
+
+  currentBookData.chapters.forEach(ch=>{
+    ch.verses.forEach(v=>{
+      if(v.text.toLowerCase().includes(q)){
+        let p=document.createElement('p');
+        p.innerHTML="<b>"+ch.chapter+":"+v.verse+"</b> "+v.text;
+        versesDiv.appendChild(p);
+      }
+    });
+  });
 }
 
-loadBook();
+loadBooks();
+
 </script>
 
 </body>
