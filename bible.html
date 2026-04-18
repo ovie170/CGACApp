@@ -6,122 +6,39 @@
 <title>Holy Bible</title>
 
 <style>
-body{
-  margin:0;
-  font-family: Georgia, serif;
-  background:#f4e4b8; /* milky gold */
-  overflow-x:hidden;
-}
+body{margin:0;font-family:Georgia,serif;background:#f4e4b8;overflow-x:hidden}
 
 /* SPLASH */
-#splash{
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:9999;
-}
+#splash{position:fixed;width:100%;height:100%;background:#000;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999}
+#splash h1{color:gold;font-size:44px;font-weight:bold;text-shadow:0 0 25px gold,0 0 50px gold;animation:glow 2s infinite alternate}
+#splash p{color:gold;margin-top:10px;font-size:20px;opacity:0.9}
+@keyframes glow{from{opacity:0.7}to{opacity:1}}
 
-#splash h1{
-  color:gold;
-  font-size:40px;
-  text-shadow:0 0 20px gold,0 0 40px gold;
-  animation:glow 2s infinite alternate;
-}
+/* GLASS LIGHTER */
+.glass{backdrop-filter:blur(2px);background:rgba(255,255,255,0.08);border-radius:14px;padding:10px;box-shadow:0 0 6px rgba(0,0,0,0.2)}
 
-@keyframes glow{
-  from{opacity:0.7}
-  to{opacity:1}
-}
+#top{display:flex;align-items:center;gap:10px;padding:10px}
+#backBtn{cursor:pointer}
 
-/* GLASS */
-.glass{
-  backdrop-filter:blur(10px);
-  background:rgba(255,255,255,0.2);
-  border-radius:15px;
-  padding:10px;
-  box-shadow:0 0 10px rgba(0,0,0,0.2);
-}
+#searchBox{display:flex;gap:10px;margin:10px}
+input{flex:1;padding:10px;border:none;outline:none;border-radius:10px}
+button{padding:10px;border:none;border-radius:10px;cursor:pointer}
 
-/* HEADER */
-#top{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px;
-}
+#books{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
+.book{text-align:center;padding:15px;cursor:pointer}
 
-#backBtn{
-  cursor:pointer;
-}
+#chapters,#verses{padding:10px}
+.chapterBtn{margin:5px}
 
-/* SEARCH */
-#searchBox{
-  display:flex;
-  gap:10px;
-  margin:10px;
-}
-
-input{
-  flex:1;
-  padding:10px;
-  border:none;
-  outline:none;
-  border-radius:10px;
-}
-
-button{
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-/* BOOKS */
-#books{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  padding:10px;
-}
-
-.book{
-  text-align:center;
-  padding:15px;
-  cursor:pointer;
-}
-
-/* CHAPTERS */
-#chapters, #verses{
-  padding:10px;
-}
-
-.chapterBtn{
-  margin:5px;
-}
-
-/* WATERMARK */
-#watermark{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  opacity:0.05;
-  width:250px;
-}
-
+#watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.05;width:250px}
 </style>
 </head>
 
 <body>
 
-<!-- SPLASH -->
 <div id="splash">
   <h1>HOLY BIBLE</h1>
+  <p>KJV VERSION</p>
 </div>
 
 <img src="logo.png" id="watermark">
@@ -132,8 +49,8 @@ button{
 </div>
 
 <div id="searchBox" class="glass">
-  <input type="text" id="searchInput" placeholder="Search verse...">
-  <button onclick="search()">Search</button>
+  <input type="text" id="searchInput" placeholder="Search (g → Genesis, love, John 3:16)">
+  <button onclick="searchAll()">Search</button>
 </div>
 
 <div id="books"></div>
@@ -142,100 +59,122 @@ button{
 
 <script>
 
-// SPLASH
-setTimeout(()=>{
-  document.getElementById('splash').style.display='none';
-},5000);
+setTimeout(()=>{document.getElementById('splash').style.display='none'},5000);
 
-// ONLY GENESIS (for now)
-const books=["Genesis"];
+const books=[
+"Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth","1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra","Nehemiah","Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos","Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah","Malachi","Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James","1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"
+];
 
-let currentBookData=null;
 let historyStack=[];
+let currentBook=null;
+let currentData=null;
+let allDataCache={};
 
-// LOAD BOOK LIST
 function loadBooks(){
-  let container=document.getElementById('books');
-  container.innerHTML="";
-
+  let c=document.getElementById('books');
+  c.innerHTML="";
   books.forEach(b=>{
-    let div=document.createElement('div');
-    div.className="book glass";
-    div.innerText=b;
-
-    div.onclick=()=>loadBook(b);
-
-    container.appendChild(div);
+    let d=document.createElement('div');
+    d.className="book glass";
+    d.innerText=b;
+    d.onclick=()=>loadBook(b);
+    c.appendChild(d);
   });
 }
 
-// LOAD BOOK JSON
 async function loadBook(book){
   let res=await fetch(book+".json");
   let data=await res.json();
+  currentBook=book;
+  currentData=data;
 
-  currentBookData=data;
-
-  document.getElementById('title').innerText=data.book;
-
+  document.getElementById('title').innerText=book;
   document.getElementById('books').innerHTML="";
   document.getElementById('verses').innerHTML="";
 
-  let chaptersDiv=document.getElementById('chapters');
-  chaptersDiv.innerHTML="";
+  let c=document.getElementById('chapters');
+  c.innerHTML="";
 
   data.chapters.forEach(ch=>{
     let btn=document.createElement('button');
     btn.className="chapterBtn glass";
     btn.innerText="Chapter "+ch.chapter;
-
     btn.onclick=()=>showChapter(ch);
-
-    chaptersDiv.appendChild(btn);
+    c.appendChild(btn);
   });
 
   historyStack.push('books');
 }
 
-// SHOW CHAPTER
 function showChapter(ch){
-  let versesDiv=document.getElementById('verses');
-  versesDiv.innerHTML="";
-
   document.getElementById('chapters').innerHTML="";
+  let v=document.getElementById('verses');
+  v.innerHTML="";
 
-  ch.verses.forEach(v=>{
+  ch.verses.forEach(x=>{
     let p=document.createElement('p');
-    p.innerHTML="<b>"+v.verse+"</b> "+v.text;
-    versesDiv.appendChild(p);
+    p.innerHTML="<b>"+x.verse+"</b> "+x.text;
+    v.appendChild(p);
   });
 
   historyStack.push('chapters');
 }
 
-// BACK BUTTON
 function goBack(){
-  location.reload();
+  let last=historyStack.pop();
+
+  if(last==='chapters'){
+    loadBook(currentBook);
+  }else if(last==='books'){
+    loadBooks();
+    document.getElementById('chapters').innerHTML="";
+    document.getElementById('verses').innerHTML="";
+    document.getElementById('title').innerText='Bible';
+  }
 }
 
-// SEARCH
-function search(){
+// SMART SEARCH (ALL BOOKS + ABBREVIATION)
+async function searchAll(){
   let q=document.getElementById('searchInput').value.toLowerCase();
-  if(!currentBookData) return;
+  let v=document.getElementById('verses');
+  v.innerHTML="";
 
-  let versesDiv=document.getElementById('verses');
-  versesDiv.innerHTML="";
+  // book abbreviation
+  let matchBook=books.find(b=>b.toLowerCase().startsWith(q));
+  if(matchBook){
+    loadBook(matchBook);
+    return;
+  }
 
-  currentBookData.chapters.forEach(ch=>{
-    ch.verses.forEach(v=>{
-      if(v.text.toLowerCase().includes(q)){
-        let p=document.createElement('p');
-        p.innerHTML="<b>"+ch.chapter+":"+v.verse+"</b> "+v.text;
-        versesDiv.appendChild(p);
-      }
+  for(let b of books){
+    if(!allDataCache[b]){
+      let res=await fetch(b+".json");
+      allDataCache[b]=await res.json();
+    }
+
+    let data=allDataCache[b];
+
+    data.chapters.forEach(ch=>{
+      ch.verses.forEach(x=>{
+        if(x.text.toLowerCase().includes(q)){
+          let p=document.createElement('p');
+          p.innerHTML="<b>"+b+" "+ch.chapter+":"+x.verse+"</b> "+x.text;
+          v.appendChild(p);
+        }
+      });
     });
-  });
+  }
 }
+
+// LIVE QUICK SUGGESTION
+
+document.getElementById('searchInput').addEventListener('input',e=>{
+  let q=e.target.value.toLowerCase();
+  let suggestion=books.find(b=>b.toLowerCase().startsWith(q));
+  if(suggestion){
+    document.getElementById('title').innerText=suggestion;
+  }
+});
 
 loadBooks();
 
