@@ -1,0 +1,6 @@
+{
+  "appId": "com.masknova.bible",
+  "appName": "Holy Bible",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
